@@ -12,19 +12,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; } /* Fondo más claro y limpio */
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .font-oswald { font-family: 'Oswald', sans-serif; }
-        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Scrollbar minimalista */
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 20px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Efecto Glass sutil para elementos flotantes */
-        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="text-slate-600 h-screen overflow-hidden flex flex-col selection:bg-blue-100 selection:text-blue-900">
@@ -75,7 +71,7 @@
     <!-- MAIN APP LAYOUT -->
     <div id="main-app" class="hidden flex h-full bg-[#f8fafc]">
         
-        <!-- SIDEBAR (Navegación) -->
+        <!-- SIDEBAR -->
         <aside class="w-20 lg:w-72 bg-white border-r border-slate-200 flex flex-col shrink-0 z-30 transition-all duration-300 shadow-sm">
             <div class="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-slate-100">
                 <img src="https://i.postimg.cc/7ZMDp79f/LOGO-PNG-NEXUS-CHESS-sin-letras.png" alt="Nexus Chess Logo" class="w-10 h-10 object-contain shrink-0 filter drop-shadow-md">
@@ -85,16 +81,17 @@
             <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
                 <div class="hidden lg:block text-xs font-bold text-slate-400 uppercase tracking-wider px-4 mb-2 mt-4">Principal</div>
                 
-                <a href="#" class="flex items-center gap-4 px-4 py-3.5 bg-blue-50/80 text-blue-700 rounded-2xl transition-all font-semibold text-sm group border border-blue-100">
+                <!-- BOTÓN INICIO (Muestra sección Home) -->
+                <button onclick="showSection('home')" id="nav-home" class="w-full flex items-center gap-4 px-4 py-3.5 bg-blue-50/80 text-blue-700 rounded-2xl transition-all font-semibold text-sm group border border-blue-100">
                     <i data-lucide="layout-grid" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
                     <span class="hidden lg:block">Panel de Control</span>
-                </a>
+                </button>
                 
-                <!-- SECCIÓN PAGOS -->
-                <a href="#payment-section" onclick="document.getElementById('payment-section').scrollIntoView({behavior: 'smooth'})" class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
+                <!-- BOTÓN PAGOS (Muestra sección Pagos) -->
+                <button onclick="showSection('payments')" id="nav-payments" class="w-full flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
                     <i data-lucide="credit-card" class="w-5 h-5 group-hover:scale-110 transition-transform text-slate-400 group-hover:text-emerald-500"></i>
                     <span class="hidden lg:block">Mis Pagos</span>
-                </a>
+                </button>
 
                 <a href="https://lichess.org/" target="_blank" class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
                     <i data-lucide="swords" class="w-5 h-5 group-hover:scale-110 transition-transform text-slate-400 group-hover:text-slate-900"></i>
@@ -133,13 +130,13 @@
             </header>
 
             <!-- SCROLLABLE CONTENT AREA -->
-            <div class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-                <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar relative">
+                
+                <!-- === SECCIÓN INICIO (VISIBLE POR DEFECTO) === -->
+                <div id="section-home" class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 fade-in">
                     
-                    <!-- COLUMNA IZQUIERDA (Perfil + Pagos) -->
-                    <div class="w-full lg:w-80 flex flex-col gap-6 shrink-0 fade-in">
-                        
-                        <!-- Tarjeta Perfil (SIN ELO) -->
+                    <!-- COLUMNA IZQUIERDA (Solo Perfil) -->
+                    <div class="w-full lg:w-80 flex flex-col gap-6 shrink-0">
                         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center relative overflow-hidden group">
                             <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-slate-100 to-slate-200 z-0"></div>
                             <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-4 border-[6px] border-white shadow-md relative z-10 text-3xl font-bold text-slate-300">
@@ -156,49 +153,16 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Tarjeta Pagos -->
-                        <div id="payment-section" class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow">
-                            <h4 class="font-bold text-slate-800 flex items-center gap-3 mb-5 text-sm uppercase tracking-wide">
-                                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-                                    <i data-lucide="credit-card" class="w-4 h-4"></i>
-                                </div>
-                                Estado de Pagos
-                            </h4>
-                            
-                            <div class="space-y-4">
-                                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                    <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Último Pago</div>
-                                    <div class="flex items-baseline gap-1">
-                                        <span class="text-sm text-slate-500 font-medium">S/.</span>
-                                        <span id="dash-amount" class="text-2xl font-bold text-slate-800">0.00</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex justify-between items-center px-2">
-                                    <span class="text-xs font-semibold text-slate-500">Próximo Vencimiento</span>
-                                    <span id="dash-renewal" class="text-xs font-bold text-slate-800 bg-slate-100 px-2 py-1 rounded-md">---</span>
-                                </div>
-                                
-                                <div class="pt-4 mt-2 border-t border-slate-50">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
-                                        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wide">Pago al día</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
 
-                    <!-- COLUMNA DERECHA (Contenido Principal) -->
-                    <div class="flex-1 flex flex-col gap-6 fade-in" style="animation-delay: 0.1s;">
+                    <!-- COLUMNA DERECHA (Banner + Académico) -->
+                    <div class="flex-1 flex flex-col gap-6">
                         
-                        <!-- Banner Bienvenida -->
+                        <!-- Banner Bienvenida (TEXTO CAMBIADO A "Bienvenido") -->
                         <div class="bg-slate-900 rounded-3xl p-8 text-white shadow-lg relative overflow-hidden group">
                             <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                                 <div>
-                                    <h3 class="text-3xl font-bold font-oswald mb-2">¡Hola, Campeón! 👋</h3>
+                                    <h3 class="text-3xl font-bold font-oswald mb-2">¡Bienvenido! 👋</h3>
                                     <p class="text-slate-300 text-sm max-w-md leading-relaxed">¿Listo para mejorar tu ajedrez hoy? Revisa tu horario y prepárate para tu próxima clase.</p>
                                 </div>
                                 <button class="px-5 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/10 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
@@ -207,14 +171,12 @@
                             </div>
                             <!-- LOGO BLANCO MARCA DE AGUA -->
                             <img src="https://i.postimg.cc/xTd0NgKW/NEXUS-CHESS-BLANCO.png" class="absolute -right-10 -bottom-16 w-64 h-64 opacity-[0.07] rotate-12 object-contain pointer-events-none group-hover:scale-105 transition-transform duration-700">
-                            <!-- Decoración sutil -->
                             <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 blur-[80px] rounded-full pointer-events-none"></div>
                         </div>
 
-                        <!-- Grid Contenido Académico -->
+                        <!-- Grid Académico -->
                         <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 flex-1">
-                            
-                            <!-- Tarjeta Horarios (Ahora más grande) -->
+                            <!-- Horarios -->
                             <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col">
                                 <h4 class="font-bold text-slate-800 flex items-center gap-3 mb-6 text-sm uppercase tracking-wide">
                                     <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
@@ -222,7 +184,6 @@
                                     </div>
                                     Mi Próxima Clase
                                 </h4>
-                                
                                 <div class="flex-1 flex flex-col justify-center gap-6">
                                     <div class="bg-gradient-to-br from-purple-50 to-white rounded-2xl p-6 border border-purple-100 text-center relative overflow-hidden">
                                         <div class="relative z-10">
@@ -231,7 +192,6 @@
                                         </div>
                                         <div class="absolute -right-4 -top-4 w-24 h-24 bg-purple-100 rounded-full blur-2xl opacity-50"></div>
                                     </div>
-                                    
                                     <div class="text-center">
                                         <a id="btn-meet" href="#" target="_blank" class="w-full inline-flex items-center justify-center gap-3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-slate-900/10 group">
                                             <div class="p-1 bg-white/20 rounded-md"><i data-lucide="video" class="w-4 h-4"></i></div>
@@ -242,7 +202,7 @@
                                 </div>
                             </div>
 
-                            <!-- Tarjeta Asistencia -->
+                            <!-- Asistencia -->
                             <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col">
                                 <h4 class="font-bold text-slate-800 flex items-center gap-3 mb-6 text-sm uppercase tracking-wide">
                                     <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
@@ -250,21 +210,17 @@
                                     </div>
                                     Resumen de Asistencia
                                 </h4>
-
                                 <div class="flex items-center justify-center mb-6">
-                                    <!-- Simple Pie Chart visual con CSS -->
                                     <div class="relative w-32 h-32 rounded-full border-[6px] border-slate-50 flex items-center justify-center">
                                         <div class="text-center">
                                             <div id="stat-present-big" class="text-3xl font-black text-slate-800">0</div>
                                             <div class="text-[9px] uppercase font-bold text-slate-400">Total</div>
                                         </div>
-                                        <!-- Anillos decorativos de progreso -->
                                         <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
                                             <path class="text-emerald-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="0, 100" id="ring-present" />
                                         </svg>
                                     </div>
                                 </div>
-
                                 <div class="grid grid-cols-3 gap-3">
                                     <div class="text-center p-2 rounded-xl bg-emerald-50 border border-emerald-100">
                                         <div id="stat-present" class="text-lg font-bold text-emerald-700">0</div>
@@ -280,11 +236,50 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- === SECCIÓN PAGOS (OCULTA POR DEFECTO) === -->
+                <div id="section-payments" class="hidden max-w-4xl mx-auto fade-in h-full flex-col justify-center">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 flex flex-col md:flex-row gap-8 items-center">
+                        <div class="w-full md:w-1/2">
+                            <h2 class="text-3xl font-oswald font-bold text-slate-800 mb-4">Estado Financiero</h2>
+                            <p class="text-slate-500 mb-6">Aquí puedes revisar el detalle de tus pagos, próximas fechas de vencimiento y estado de cuenta actual.</p>
+                            
+                            <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100 mb-4">
+                                <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Último Pago Registrado</div>
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-lg text-slate-500 font-medium">S/.</span>
+                                    <span id="dash-amount" class="text-4xl font-bold text-slate-800">0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                                    <span class="text-sm font-semibold text-slate-500">Próximo Vencimiento</span>
+                                    <span id="dash-renewal" class="text-sm font-bold text-slate-800 bg-slate-100 px-3 py-1 rounded-full">---</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                                    <span class="text-sm font-semibold text-slate-500">Estado de Cuenta</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
+                                        <span class="text-sm font-bold text-emerald-600 uppercase tracking-wide">Al día</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="w-full md:w-1/2 flex justify-center">
+                             <!-- Ilustración o Icono Grande -->
+                             <div class="w-64 h-64 bg-slate-50 rounded-full flex items-center justify-center relative overflow-hidden border-4 border-white shadow-inner">
+                                <i data-lucide="credit-card" class="w-32 h-32 text-slate-200"></i>
+                                <div class="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-transparent"></div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
                 <footer class="mt-12 text-center pb-6">
                     <p class="text-xs text-slate-400 font-medium">© 2024 Nexus Chess Academy. Todos los derechos reservados.</p>
                 </footer>
@@ -326,6 +321,36 @@
             }
         });
 
+        // SISTEMA DE NAVEGACIÓN SIMPLE
+        window.showSection = function(sectionId) {
+            // Ocultar todas las secciones
+            document.getElementById('section-home').classList.add('hidden');
+            document.getElementById('section-payments').classList.add('hidden');
+            
+            // Desactivar estilos de botones
+            const btnHome = document.getElementById('nav-home');
+            const btnPay = document.getElementById('nav-payments');
+            
+            btnHome.classList.remove('bg-blue-50/80', 'text-blue-700', 'border-blue-100');
+            btnHome.classList.add('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
+            
+            btnPay.classList.remove('bg-blue-50/80', 'text-blue-700', 'border-blue-100');
+            btnPay.classList.add('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
+
+            // Mostrar sección seleccionada y activar botón
+            if(sectionId === 'home') {
+                document.getElementById('section-home').classList.remove('hidden');
+                btnHome.classList.add('bg-blue-50/80', 'text-blue-700', 'border-blue-100');
+                btnHome.classList.remove('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
+            } else if (sectionId === 'payments') {
+                document.getElementById('section-payments').classList.remove('hidden');
+                // Hacemos que payments se vea flex cuando se activa
+                document.getElementById('section-payments').classList.add('flex'); 
+                btnPay.classList.add('bg-blue-50/80', 'text-blue-700', 'border-blue-100');
+                btnPay.classList.remove('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
+            }
+        }
+
         // SISTEMA DE LOGIN
         window.handleLogin = function(e) {
             e.preventDefault();
@@ -354,7 +379,6 @@
             }
         };
 
-        // ASIGNAR EVENTO AL FORMULARIO
         document.getElementById('login-form').addEventListener('submit', window.handleLogin);
 
         window.checkSession = function() {
@@ -402,7 +426,7 @@
             }
 
             document.getElementById('dash-renewal').innerText = student.renewalDate || '---';
-            document.getElementById('dash-amount').innerText = `S/. ${student.paymentAmount.toFixed(2)}`;
+            document.getElementById('dash-amount').innerText = student.paymentAmount.toFixed(2);
             calculateAttendance(student.id);
             lucide.createIcons();
         }
@@ -423,7 +447,6 @@
             document.getElementById('stat-absent').innerText = absent;
             document.getElementById('stat-present-big').innerText = present;
             
-            // Animación simple del anillo (calculando dasharray)
             if (total > 0) {
                 const percentage = (present / total) * 100;
                 document.getElementById('ring-present').setAttribute('stroke-dasharray', `${percentage}, 100`);
