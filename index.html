@@ -1,10 +1,10 @@
-
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal del Estudiante | Nexus Chess</title>
-    <!-- FAVICON CAMBIADO AL LOGO BLANCO -->
+    <!-- FAVICON -->
     <link rel="icon" type="image/png" href="https://i.postimg.cc/xTd0NgKW/NEXUS-CHESS-BLANCO.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,139 +12,292 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; } /* Fondo más claro y limpio */
         .font-oswald { font-family: 'Oswald', sans-serif; }
-        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Scrollbar minimalista */
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 20px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Efecto Glass sutil para elementos flotantes */
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
     </style>
 </head>
-<body class="text-slate-800 h-screen overflow-hidden flex flex-col">
+<body class="text-slate-600 h-screen overflow-hidden flex flex-col selection:bg-blue-100 selection:text-blue-900">
 
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-[url('https://images.unsplash.com/photo-1529699211952-734e80c4d42b?q=80&w=2071&auto=format&fit=crop')] bg-cover bg-center">
         <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
-        <div class="relative w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl mx-4 fade-in">
-            <div class="text-center mb-8">
-                <!-- LOGO ORIGINAL A COLOR (MANTENIDO) -->
-                <div class="w-24 h-24 mx-auto mb-4 flex items-center justify-center">
-                    <img src="https://i.postimg.cc/7ZMDp79f/LOGO-PNG-NEXUS-CHESS-sin-letras.png" alt="Nexus Chess Logo" class="w-full h-full object-contain drop-shadow-xl">
+        <div class="relative w-full max-w-md p-10 bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl mx-4 fade-in border border-white/20">
+            <div class="text-center mb-10">
+                <div class="w-28 h-28 mx-auto mb-6 flex items-center justify-center transform hover:scale-105 transition-transform duration-500">
+                    <img src="https://i.postimg.cc/7ZMDp79f/LOGO-PNG-NEXUS-CHESS-sin-letras.png" alt="Nexus Chess Logo" class="w-full h-full object-contain drop-shadow-2xl">
                 </div>
-                <h1 class="text-2xl font-bold text-slate-900 font-oswald tracking-wide">NEXUS CHESS</h1>
-                <p class="text-slate-500 text-sm">Portal del Estudiante</p>
+                <h1 class="text-3xl font-bold text-slate-900 font-oswald tracking-wide mb-2">NEXUS CHESS</h1>
+                <div class="h-1 w-16 bg-blue-600 mx-auto rounded-full mb-3"></div>
+                <p class="text-slate-500 font-medium">Portal del Estudiante</p>
             </div>
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Código de Alumno</label>
-                    <div class="relative">
-                        <i data-lucide="user" class="absolute left-3 top-3 text-slate-400 w-5 h-5"></i>
-                        <input type="text" id="login-code" placeholder="Ej: STU-1736..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+            <form id="login-form" class="space-y-5">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Código de Alumno</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i data-lucide="user" class="text-slate-400 group-focus-within:text-blue-600 transition-colors w-5 h-5"></i>
+                        </div>
+                        <input type="text" id="login-code" placeholder="Ej: STU-1736..." class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-medium text-slate-800">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Contraseña (DNI Apoderado)</label>
-                    <div class="relative">
-                        <i data-lucide="lock" class="absolute left-3 top-3 text-slate-400 w-5 h-5"></i>
-                        <input type="password" id="login-pass" placeholder="Ingrese DNI" class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Contraseña</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i data-lucide="lock" class="text-slate-400 group-focus-within:text-blue-600 transition-colors w-5 h-5"></i>
+                        </div>
+                        <input type="password" id="login-pass" placeholder="DNI del Apoderado" class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-medium text-slate-800">
                     </div>
                 </div>
-                <div id="login-error" class="hidden text-red-500 text-xs font-bold text-center bg-red-50 p-2 rounded-lg">Credenciales incorrectas</div>
-                <button type="submit" id="btn-login-submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-900/20 transition-all transform active:scale-[0.98]">INGRESAR AL AULA</button>
+                <div id="login-error" class="hidden text-red-500 text-xs font-bold text-center bg-red-50 border border-red-100 p-3 rounded-xl flex items-center justify-center gap-2">
+                    <i data-lucide="alert-circle" class="w-4 h-4"></i> Credenciales incorrectas
+                </div>
+                <button type="submit" id="btn-login-submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-xl shadow-slate-900/20 transition-all transform hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 mt-4">
+                    <span>INGRESAR AL AULA</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
             </form>
-            <p class="mt-6 text-center text-xs text-slate-400">¿Olvidaste tu código? Contacta a administración.</p>
+            <!-- CAMBIO AQUÍ: ENLACE A WHATSAPP AUTOMÁTICO -->
+            <p class="mt-8 text-center text-xs text-slate-400 font-medium">¿Problemas para ingresar? <a href="https://wa.me/51999999999?text=Hola%20Soporte%20Nexus%20Chess,%20tengo%20problemas%20para%20ingresar%20al%20aula%20virtual." target="_blank" class="text-blue-600 hover:underline font-bold transition-colors hover:text-blue-700">Contactar Soporte</a></p>
         </div>
     </div>
 
-    <!-- MAIN APP -->
-    <div id="main-app" class="hidden flex h-full">
-        <aside class="w-20 lg:w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 z-20">
-            <div class="h-16 flex items-center justify-center lg:justify-start lg:px-6 border-b border-slate-100">
-                <!-- LOGO ORIGINAL A COLOR (MANTENIDO) -->
-                <img src="https://i.postimg.cc/7ZMDp79f/LOGO-PNG-NEXUS-CHESS-sin-letras.png" alt="Nexus Chess Logo" class="w-10 h-10 object-contain shrink-0">
-                <span class="hidden lg:block ml-3 font-bold text-slate-800 font-oswald tracking-wide text-lg">NEXUS</span>
+    <!-- MAIN APP LAYOUT -->
+    <div id="main-app" class="hidden flex h-full bg-[#f8fafc]">
+        
+        <!-- SIDEBAR (Navegación) -->
+        <aside class="w-20 lg:w-72 bg-white border-r border-slate-200 flex flex-col shrink-0 z-30 transition-all duration-300 shadow-sm">
+            <div class="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-slate-100">
+                <img src="https://i.postimg.cc/7ZMDp79f/LOGO-PNG-NEXUS-CHESS-sin-letras.png" alt="Nexus Chess Logo" class="w-10 h-10 object-contain shrink-0 filter drop-shadow-md">
+                <span class="hidden lg:block ml-4 font-bold text-slate-800 font-oswald tracking-wide text-xl">NEXUS CHESS</span>
             </div>
-            <nav class="flex-1 p-4 space-y-2">
-                <a href="#" class="flex items-center gap-3 px-3 py-3 bg-blue-50 text-blue-700 rounded-xl transition-colors font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="hidden lg:block">Inicio</span></a>
-                <a href="#" onclick="alert('Próximamente')" class="flex items-center gap-3 px-3 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-700 rounded-xl transition-colors font-medium text-sm"><i data-lucide="trophy" class="w-5 h-5"></i><span class="hidden lg:block">Torneos</span></a>
+            
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
+                <div class="hidden lg:block text-xs font-bold text-slate-400 uppercase tracking-wider px-4 mb-2 mt-4">Principal</div>
+                
+                <a href="#" class="flex items-center gap-4 px-4 py-3.5 bg-blue-50/80 text-blue-700 rounded-2xl transition-all font-semibold text-sm group border border-blue-100">
+                    <i data-lucide="layout-grid" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                    <span class="hidden lg:block">Panel de Control</span>
+                </a>
+                
+                <a href="#" onclick="alert('Próximamente')" class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
+                    <i data-lucide="trophy" class="w-5 h-5 group-hover:scale-110 transition-transform text-slate-400 group-hover:text-amber-500"></i>
+                    <span class="hidden lg:block">Torneos</span>
+                </a>
+
+                 <a href="#" onclick="alert('Próximamente')" class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
+                    <i data-lucide="book-open" class="w-5 h-5 group-hover:scale-110 transition-transform text-slate-400 group-hover:text-purple-500"></i>
+                    <span class="hidden lg:block">Lecciones</span>
+                </a>
+
+                <!-- NUEVA OPCIÓN AÑADIDA -->
+                <a href="https://lichess.org/" target="_blank" class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
+                    <i data-lucide="swords" class="w-5 h-5 group-hover:scale-110 transition-transform text-slate-400 group-hover:text-slate-900"></i>
+                    <span class="hidden lg:block">Practicar (Lichess)</span>
+                </a>
             </nav>
+
             <div class="p-4 border-t border-slate-100">
-                <button onclick="logout()" class="flex items-center gap-3 px-3 py-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors font-medium text-sm w-full"><i data-lucide="log-out" class="w-5 h-5"></i><span class="hidden lg:block">Cerrar Sesión</span></button>
+                <button onclick="logout()" class="flex items-center gap-3 px-4 py-3.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all font-medium text-sm w-full group">
+                    <i data-lucide="log-out" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                    <span class="hidden lg:block">Cerrar Sesión</span>
+                </button>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col overflow-hidden bg-[#f8f9fa] relative">
-            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
-                <h2 class="text-lg font-bold text-slate-800 hidden md:block">Mi Aula Virtual</h2>
-                <div class="flex items-center gap-4 ml-auto">
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 flex flex-col overflow-hidden relative">
+            
+            <!-- HEADER -->
+            <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200/60 flex items-center justify-between px-6 lg:px-10 shrink-0 sticky top-0 z-20">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 font-oswald hidden md:block">Mi Aula Virtual</h2>
+                </div>
+                <div class="flex items-center gap-6">
                     <div class="text-right hidden md:block">
                         <div id="header-name" class="text-sm font-bold text-slate-800 leading-none">Cargando...</div>
-                        <div id="header-code" class="text-xs text-slate-500 mt-1 font-mono">---</div>
+                        <div class="flex items-center justify-end gap-1.5 mt-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span id="header-code" class="text-xs text-slate-500 font-mono tracking-tight">---</span>
+                        </div>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm"><i data-lucide="user" class="w-6 h-6 text-slate-400"></i></div>
+                    <button class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm hover:ring-2 hover:ring-blue-100 transition-all">
+                        <i data-lucide="user" class="w-6 h-6 text-slate-400"></i>
+                    </button>
                 </div>
             </header>
 
+            <!-- SCROLLABLE CONTENT AREA -->
             <div class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-                <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-6 text-white mb-8 shadow-lg relative overflow-hidden">
-                    <div class="relative z-10"><h3 class="text-2xl font-bold font-oswald mb-2">¡Bienvenido de nuevo!</h3><p class="text-blue-200 text-sm max-w-lg">Revisa tus horarios, pagos y progreso.</p></div>
-                    <!-- LOGO BLANCO EN BANNER (MANTENIDO) -->
-                    <img src="https://i.postimg.cc/xTd0NgKW/NEXUS-CHESS-BLANCO.png" class="absolute -right-6 -bottom-6 w-48 h-48 opacity-10 rotate-12 object-contain pointer-events-none">
+                <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
+                    
+                    <!-- COLUMNA IZQUIERDA (Perfil + Pagos) -->
+                    <div class="w-full lg:w-80 flex flex-col gap-6 shrink-0 fade-in">
+                        
+                        <!-- Tarjeta Perfil -->
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center relative overflow-hidden group">
+                            <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-slate-100 to-slate-200 z-0"></div>
+                            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-4 border-[6px] border-white shadow-md relative z-10 text-3xl font-bold text-slate-300">
+                                <span id="profile-initials">--</span>
+                            </div>
+                            <div class="relative z-10 w-full">
+                                <h5 id="profile-fullname" class="font-bold text-slate-800 text-lg leading-tight mb-1">---</h5>
+                                <span class="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider rounded-full mb-4">Estudiante Activo</span>
+                                <div class="grid grid-cols-2 gap-2 w-full pt-4 border-t border-slate-50">
+                                    <div class="text-center">
+                                        <div class="text-xs text-slate-400 font-semibold uppercase">Elo</div>
+                                        <div class="font-bold text-slate-700">1200</div>
+                                    </div>
+                                    <div class="text-center border-l border-slate-50">
+                                        <div class="text-xs text-slate-400 font-semibold uppercase">Nivel</div>
+                                        <div class="font-bold text-slate-700">Básico</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta Pagos (AHORA A LA IZQUIERDA) -->
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow">
+                            <h4 class="font-bold text-slate-800 flex items-center gap-3 mb-5 text-sm uppercase tracking-wide">
+                                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                                    <i data-lucide="credit-card" class="w-4 h-4"></i>
+                                </div>
+                                Estado de Pagos
+                            </h4>
+                            
+                            <div class="space-y-4">
+                                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Último Pago</div>
+                                    <div class="flex items-baseline gap-1">
+                                        <span class="text-sm text-slate-500 font-medium">S/.</span>
+                                        <span id="dash-amount" class="text-2xl font-bold text-slate-800">0.00</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-between items-center px-2">
+                                    <span class="text-xs font-semibold text-slate-500">Próximo Vencimiento</span>
+                                    <span id="dash-renewal" class="text-xs font-bold text-slate-800 bg-slate-100 px-2 py-1 rounded-md">---</span>
+                                </div>
+                                
+                                <div class="pt-4 mt-2 border-t border-slate-50">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
+                                        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wide">Pago al día</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- COLUMNA DERECHA (Contenido Principal) -->
+                    <div class="flex-1 flex flex-col gap-6 fade-in" style="animation-delay: 0.1s;">
+                        
+                        <!-- Banner Bienvenida -->
+                        <div class="bg-slate-900 rounded-3xl p-8 text-white shadow-lg relative overflow-hidden group">
+                            <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                <div>
+                                    <h3 class="text-3xl font-bold font-oswald mb-2">¡Hola, Campeón! 👋</h3>
+                                    <p class="text-slate-300 text-sm max-w-md leading-relaxed">¿Listo para mejorar tu ajedrez hoy? Revisa tu horario y prepárate para tu próxima clase.</p>
+                                </div>
+                                <button class="px-5 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/10 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
+                                    Ver Calendario
+                                </button>
+                            </div>
+                            <!-- LOGO BLANCO MARCA DE AGUA -->
+                            <img src="https://i.postimg.cc/xTd0NgKW/NEXUS-CHESS-BLANCO.png" class="absolute -right-10 -bottom-16 w-64 h-64 opacity-[0.07] rotate-12 object-contain pointer-events-none group-hover:scale-105 transition-transform duration-700">
+                            <!-- Decoración sutil -->
+                            <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 blur-[80px] rounded-full pointer-events-none"></div>
+                        </div>
+
+                        <!-- Grid Contenido Académico -->
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 flex-1">
+                            
+                            <!-- Tarjeta Horarios (Ahora más grande) -->
+                            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col">
+                                <h4 class="font-bold text-slate-800 flex items-center gap-3 mb-6 text-sm uppercase tracking-wide">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
+                                        <i data-lucide="calendar-clock" class="w-4 h-4"></i>
+                                    </div>
+                                    Mi Próxima Clase
+                                </h4>
+                                
+                                <div class="flex-1 flex flex-col justify-center gap-6">
+                                    <div class="bg-gradient-to-br from-purple-50 to-white rounded-2xl p-6 border border-purple-100 text-center relative overflow-hidden">
+                                        <div class="relative z-10">
+                                            <div id="dash-schedule" class="text-xl md:text-2xl font-bold text-purple-900 mb-2">---</div>
+                                            <div id="dash-modality" class="inline-block px-3 py-1 bg-white rounded-lg shadow-sm text-[10px] font-bold text-purple-600 uppercase tracking-wider border border-purple-50">---</div>
+                                        </div>
+                                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-purple-100 rounded-full blur-2xl opacity-50"></div>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <a id="btn-meet" href="#" target="_blank" class="w-full inline-flex items-center justify-center gap-3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-slate-900/10 group">
+                                            <div class="p-1 bg-white/20 rounded-md"><i data-lucide="video" class="w-4 h-4"></i></div>
+                                            <span>INGRESAR A CLASE</span>
+                                        </a>
+                                        <p id="no-link-msg" class="text-[10px] text-red-400 mt-3 hidden font-medium flex items-center justify-center gap-1"><i data-lucide="x-circle" class="w-3 h-3"></i> Enlace no disponible</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta Asistencia -->
+                            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col">
+                                <h4 class="font-bold text-slate-800 flex items-center gap-3 mb-6 text-sm uppercase tracking-wide">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                                    </div>
+                                    Resumen de Asistencia
+                                </h4>
+
+                                <div class="flex items-center justify-center mb-6">
+                                    <!-- Simple Pie Chart visual con CSS -->
+                                    <div class="relative w-32 h-32 rounded-full border-[6px] border-slate-50 flex items-center justify-center">
+                                        <div class="text-center">
+                                            <div id="stat-present-big" class="text-3xl font-black text-slate-800">0</div>
+                                            <div class="text-[9px] uppercase font-bold text-slate-400">Total</div>
+                                        </div>
+                                        <!-- Anillos decorativos de progreso -->
+                                        <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
+                                            <path class="text-emerald-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="0, 100" id="ring-present" />
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-3">
+                                    <div class="text-center p-2 rounded-xl bg-emerald-50 border border-emerald-100">
+                                        <div id="stat-present" class="text-lg font-bold text-emerald-700">0</div>
+                                        <div class="text-[9px] font-bold text-emerald-400 uppercase">Asistió</div>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-amber-50 border border-amber-100">
+                                        <div id="stat-late" class="text-lg font-bold text-amber-700">0</div>
+                                        <div class="text-[9px] font-bold text-amber-400 uppercase">Tardanza</div>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-red-50 border border-red-100">
+                                        <div id="stat-absent" class="text-lg font-bold text-red-700">0</div>
+                                        <div class="text-[9px] font-bold text-red-400 uppercase">Falta</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                        <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-4"><i data-lucide="calendar-clock" class="w-5 h-5 text-purple-600"></i> Mis Horarios</h4>
-                        <div class="bg-purple-50 rounded-xl p-4 border border-purple-100 mb-4">
-                            <div id="dash-schedule" class="text-lg font-bold text-purple-900 text-center">---</div>
-                            <div id="dash-modality" class="text-center text-xs font-bold text-purple-600 uppercase tracking-wider mt-1">---</div>
-                        </div>
-                        <div class="text-center">
-                            <a id="btn-meet" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl transition-all text-sm"><i data-lucide="video" class="w-4 h-4"></i> INGRESAR A CLASE</a>
-                            <p id="no-link-msg" class="text-[10px] text-red-400 mt-2 hidden">Enlace aún no disponible</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                        <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-4"><i data-lucide="credit-card" class="w-5 h-5 text-blue-600"></i> Mis Pagos</h4>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                <span class="text-xs text-slate-500 font-medium uppercase">Próximo Vencimiento</span>
-                                <span id="dash-renewal" class="font-bold text-slate-800">---</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                <span class="text-xs text-slate-500 font-medium uppercase">Último Pago</span>
-                                <span id="dash-amount" class="font-bold text-emerald-600">S/. 0.00</span>
-                            </div>
-                            <div class="mt-4 pt-4 border-t border-slate-100">
-                                <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 rounded-full bg-emerald-500"></div><span class="text-xs font-bold text-slate-600">Estado: <span class="text-emerald-600">Al día</span></span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow flex flex-col">
-                        <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-4"><i data-lucide="id-card" class="w-5 h-5 text-orange-500"></i> Mi Perfil</h4>
-                        <div class="flex-1 flex flex-col justify-center items-center text-center p-4">
-                            <div class="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mb-3 border-4 border-white shadow-sm"><span id="profile-initials" class="text-2xl font-bold text-slate-400">--</span></div>
-                            <h5 id="profile-fullname" class="font-bold text-slate-800 text-sm">---</h5>
-                        </div>
-                    </div>
-
-                    <div class="md:col-span-2 xl:col-span-3 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                         <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-4"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500"></i> Registro de Asistencia</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100 text-center"><div id="stat-present" class="text-2xl font-black text-emerald-600">0</div><div class="text-[10px] uppercase font-bold text-emerald-400">Asistencias</div></div>
-                            <div class="bg-amber-50 p-3 rounded-xl border border-amber-100 text-center"><div id="stat-late" class="text-2xl font-black text-amber-600">0</div><div class="text-[10px] uppercase font-bold text-amber-400">Tardanzas</div></div>
-                            <div class="bg-red-50 p-3 rounded-xl border border-red-100 text-center"><div id="stat-absent" class="text-2xl font-black text-red-600">0</div><div class="text-[10px] uppercase font-bold text-red-400">Faltas</div></div>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden flex">
-                            <div id="bar-present" class="h-full bg-emerald-500" style="width: 0%"></div>
-                            <div id="bar-late" class="h-full bg-amber-400" style="width: 0%"></div>
-                            <div id="bar-absent" class="h-full bg-red-400" style="width: 0%"></div>
-                        </div>
-                    </div>
-                </div>
+                
+                <footer class="mt-12 text-center pb-6">
+                    <p class="text-xs text-slate-400 font-medium">© 2024 Nexus Chess Academy. Todos los derechos reservados.</p>
+                </footer>
             </div>
         </main>
     </div>
@@ -206,7 +359,7 @@
                 errorMsg.classList.add('hidden');
                 initDashboard(student);
             } else {
-                errorMsg.innerText = "Usuario o contraseña incorrectos";
+                errorMsg.innerText = "Error de credenciales";
                 errorMsg.classList.remove('hidden');
             }
         };
@@ -249,12 +402,12 @@
             if (classInfo && classInfo.meetLink && classInfo.meetLink.length > 5) {
                 meetBtn.href = classInfo.meetLink;
                 meetBtn.classList.remove('opacity-50', 'pointer-events-none', 'bg-slate-400');
-                meetBtn.classList.add('bg-slate-800', 'hover:bg-slate-700');
+                meetBtn.classList.add('bg-slate-900', 'hover:bg-slate-800');
                 document.getElementById('no-link-msg').classList.add('hidden');
             } else {
                 meetBtn.href = "#";
                 meetBtn.classList.add('opacity-50', 'pointer-events-none', 'bg-slate-400');
-                meetBtn.classList.remove('bg-slate-800', 'hover:bg-slate-700');
+                meetBtn.classList.remove('bg-slate-900', 'hover:bg-slate-800');
                 document.getElementById('no-link-msg').classList.remove('hidden');
             }
 
@@ -278,10 +431,12 @@
             document.getElementById('stat-present').innerText = present;
             document.getElementById('stat-late').innerText = late;
             document.getElementById('stat-absent').innerText = absent;
+            document.getElementById('stat-present-big').innerText = present;
+            
+            // Animación simple del anillo (calculando dasharray)
             if (total > 0) {
-                document.getElementById('bar-present').style.width = `${(present/total)*100}%`;
-                document.getElementById('bar-late').style.width = `${(late/total)*100}%`;
-                document.getElementById('bar-absent').style.width = `${(absent/total)*100}%`;
+                const percentage = (present / total) * 100;
+                document.getElementById('ring-present').setAttribute('stroke-dasharray', `${percentage}, 100`);
             }
         }
         
