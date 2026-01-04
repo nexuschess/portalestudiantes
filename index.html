@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal del Estudiante | Nexus Chess</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .font-oswald { font-family: 'Oswald', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="text-slate-800 h-screen overflow-hidden flex flex-col">
+
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-[url('https://images.unsplash.com/photo-1529699211952-734e80c4d42b?q=80&w=2071&auto=format&fit=crop')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
+        <div class="relative w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl mx-4 fade-in">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-blue-900 rounded-xl flex items-center justify-center text-white mx-auto mb-4 shadow-lg shadow-blue-900/30">
+                    <i data-lucide="graduation-cap" class="h-8 w-8"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-900 font-oswald tracking-wide">NEXUS CHESS</h1>
+                <p class="text-slate-500 text-sm">Portal del Estudiante</p>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Código de Alumno</label>
+                    <div class="relative">
+                        <i data-lucide="user" class="absolute left-3 top-3 text-slate-400 w-5 h-5"></i>
+                        <input type="text" id="login-code" placeholder="Ej: STU-1736..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Contraseña (DNI Apoderado)</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="absolute left-3 top-3 text-slate-400 w-5 h-5"></i>
+                        <input type="password" id="login-pass" placeholder="Ingrese DNI" class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                    </div>
+                </div>
+                <div id="login-error" class="hidden text-red-500 text-xs font-bold text-center bg-red-50 p-2 rounded-lg">Credenciales incorrectas</div>
+                <button type="submit" id="btn-login-submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-900/20 transition-all transform active:scale-[0.98]">INGRESAR AL AULA</button>
+            </form>
+            <p class="mt-6 text-center text-xs text-slate-400">¿Olvidaste tu código? Contacta a administración.</p>
+        </div>
+    </div>
+
+    <div id="main-app" class="hidden flex h-full">
+        <aside class="w-20 lg:w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 z-20">
+            <div class="h-16 flex items-center justify-center lg:justify-start lg:px-6 border-b border-slate-100">
+                <div class="w-8 h-8 bg-blue-900 rounded-lg flex items-center justify-center text-white shrink-0"><i data-lucide="castle" class="h-5 w-5"></i></div>
+                <span class="hidden lg:block ml-3 font-bold text-slate-800 font-oswald tracking-wide text-lg">NEXUS</span>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" class="flex items-center gap-3 px-3 py-3 bg-blue-50 text-blue-700 rounded-xl transition-colors font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="hidden lg:block">Inicio</span></a>
+                <a href="#" onclick="alert('Próximamente')" class="flex items-center gap-3 px-3 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-700 rounded-xl transition-colors font-medium text-sm"><i data-lucide="trophy" class="w-5 h-5"></i><span class="hidden lg:block">Torneos</span></a>
+            </nav>
+            <div class="p-4 border-t border-slate-100">
+                <button onclick="logout()" class="flex items-center gap-3 px-3 py-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors font-medium text-sm w-full"><i data-lucide="log-out" class="w-5 h-5"></i><span class="hidden lg:block">Cerrar Sesión</span></button>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col overflow-hidden bg-[#f8f9fa] relative">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
+                <h2 class="text-lg font-bold text-slate-800 hidden md:block">Mi Aula Virtual</h2>
+                <div class="flex items-center gap-4 ml-auto">
+                    <div class="text-right hidden md:block">
+                        <div id="header-name" class="text-sm font-bold text-slate-800 leading-none">Cargando...</div>
+                        <div id="header-code" class="text-xs text-slate-500 mt-1 font-mono">---</div>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm"><i data-lucide="user" class="w-6 h-6 text-slate-400"></i></div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+                <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-6 text-white mb-8 shadow-lg relative overflow-hidden">
+                    <div class="relative z-10"><h3 class="text-2xl font-bold font-oswald mb-2">¡Bienvenido de nuevo!</h3><p class="text-blue-200 text-sm max-w-lg">Revisa tus horarios, pagos y progreso.</p></div>
+                    <i data-lucide="crown" class="absolute -right-6 -bottom-6 w-40 h-40 text-white/5 rotate-12"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                        <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-4"><i data-lucide="calendar-clock" class="w-5 h-5 text-purple-600"></i> Mis Horarios</h4>
+                        <div class="bg-purple-50 rounded-xl p-4 border border-purple-100 mb-4">
+                            <div id="dash-schedule" class="text-lg font-bold text-purple-900 text-center">---</div>
+                            <div id="dash-modality" class="text-center text-xs font-bold text-purple-600 uppercase tracking-wider mt-1">---</div>
+                        </div>
+                        <div class="text-center">
+                            <a id="btn-meet" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl transition-all text-sm"><i data-lucide="video" class="w-4 h-4"></i> INGRESAR A CLASE</a>
+                            <p id="no-link-msg" class="text-[10px] text-red-400 mt-2 hidden">Enlace aún no disponible</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                        <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-4"><i data-lucide="credit-card" class="w-5 h-5 text-blue-600"></i> Mis Pagos</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="text-xs text-slate-500 font-medium uppercase">Próximo Vencimiento</span>
+                                <span id="dash-renewal" class="font-bold text-slate-800">---</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="text-xs text-slate-500 font-medium uppercase">Último Pago</span>
+                                <span id="dash-amount" class="font-bold text-emerald-600">S/. 0.00</span>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-slate-100">
+                                <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 rounded-full bg-emerald-500"></div><span class="text-xs font-bold text-slate-600">Estado: <span class="text-emerald-600">Al día</span></span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow flex flex-col">
+                        <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-4"><i data-lucide="id-card" class="w-5 h-5 text-orange-500"></i> Mi Perfil</h4>
+                        <div class="flex-1 flex flex-col justify-center items-center text-center p-4">
+                            <div class="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mb-3 border-4 border-white shadow-sm"><span id="profile-initials" class="text-2xl font-bold text-slate-400">--</span></div>
+                            <h5 id="profile-fullname" class="font-bold text-slate-800 text-sm">---</h5>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2 xl:col-span-3 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                         <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-4"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500"></i> Registro de Asistencia</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100 text-center"><div id="stat-present" class="text-2xl font-black text-emerald-600">0</div><div class="text-[10px] uppercase font-bold text-emerald-400">Asistencias</div></div>
+                            <div class="bg-amber-50 p-3 rounded-xl border border-amber-100 text-center"><div id="stat-late" class="text-2xl font-black text-amber-600">0</div><div class="text-[10px] uppercase font-bold text-amber-400">Tardanzas</div></div>
+                            <div class="bg-red-50 p-3 rounded-xl border border-red-100 text-center"><div id="stat-absent" class="text-2xl font-black text-red-600">0</div><div class="text-[10px] uppercase font-bold text-red-400">Faltas</div></div>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden flex">
+                            <div id="bar-present" class="h-full bg-emerald-500" style="width: 0%"></div>
+                            <div id="bar-late" class="h-full bg-amber-400" style="width: 0%"></div>
+                            <div id="bar-absent" class="h-full bg-red-400" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // --- TU CONFIGURACIÓN DE FIREBASE (YA PEGADA) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_JqJuavM7TBvnuWtFW55wxqFSWMxrk3Q",
+            authDomain: "nexus-chess-base-general.firebaseapp.com",
+            databaseURL: "https://nexus-chess-base-general-default-rtdb.firebaseio.com",
+            projectId: "nexus-chess-base-general",
+            storageBucket: "nexus-chess-base-general.firebasestorage.app",
+            messagingSenderId: "521727118362",
+            appId: "1:521727118362:web:0ac3549eec2a67009595a3",
+            measurementId: "G-44QJGQQ2FC"
+        };
+        // ----------------------------------------------
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // VARIABLES GLOBALES
+        window.systemData = null;
+        window.currentUser = null;
+
+        // CONEXIÓN EN TIEMPO REAL
+        const dbRef = ref(db, 'academy_v1');
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                window.systemData = data;
+                checkSession(); // Revisa si ya había sesión abierta
+            }
+        });
+
+        // SISTEMA DE LOGIN
+        window.handleLogin = function(e) {
+            e.preventDefault();
+            const code = document.getElementById('login-code').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            const errorMsg = document.getElementById('login-error');
+
+            if (!window.systemData || !window.systemData.students) {
+                errorMsg.innerText = "Error: Cargando sistema...";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            
+            const student = window.systemData.students.find(s => {
+                const studentCode = s.discountCode || `STU-${s.id}`;
+                return studentCode.toUpperCase() === code.toUpperCase() && s.guardianDni === pass;
+            });
+
+            if (student) {
+                localStorage.setItem('nexus_student_session', JSON.stringify(student.id));
+                errorMsg.classList.add('hidden');
+                initDashboard(student);
+            } else {
+                errorMsg.innerText = "Usuario o contraseña incorrectos";
+                errorMsg.classList.remove('hidden');
+            }
+        };
+
+        // ASIGNAR EVENTO AL FORMULARIO
+        document.getElementById('login-form').addEventListener('submit', window.handleLogin);
+
+        window.checkSession = function() {
+            const sessionId = localStorage.getItem('nexus_student_session');
+            if (sessionId && window.systemData && window.systemData.students) {
+                const student = window.systemData.students.find(s => s.id == sessionId);
+                if (student) initDashboard(student);
+            }
+        }
+
+        window.logout = function() {
+            localStorage.removeItem('nexus_student_session');
+            location.reload();
+        }
+
+        function initDashboard(student) {
+            window.currentUser = student;
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('fade-in');
+
+            document.getElementById('header-name').innerText = `${student.studentName} ${student.studentLastName}`;
+            document.getElementById('header-code').innerText = student.discountCode || `STU-${student.id}`;
+            document.getElementById('profile-fullname').innerText = `${student.studentName} ${student.studentLastName}`;
+            document.getElementById('profile-initials').innerText = student.studentName.charAt(0) + student.studentLastName.charAt(0);
+            document.getElementById('dash-schedule').innerText = student.schedule;
+            document.getElementById('dash-modality').innerText = `Modalidad ${student.modality}`;
+            
+            let classInfo = null;
+            if (window.systemData.classrooms) {
+                classInfo = window.systemData.classrooms.find(c => c.id === student.assignedClassId);
+            }
+            
+            const meetBtn = document.getElementById('btn-meet');
+            if (classInfo && classInfo.meetLink && classInfo.meetLink.length > 5) {
+                meetBtn.href = classInfo.meetLink;
+                meetBtn.classList.remove('opacity-50', 'pointer-events-none', 'bg-slate-400');
+                meetBtn.classList.add('bg-slate-800', 'hover:bg-slate-700');
+                document.getElementById('no-link-msg').classList.add('hidden');
+            } else {
+                meetBtn.href = "#";
+                meetBtn.classList.add('opacity-50', 'pointer-events-none', 'bg-slate-400');
+                meetBtn.classList.remove('bg-slate-800', 'hover:bg-slate-700');
+                document.getElementById('no-link-msg').classList.remove('hidden');
+            }
+
+            document.getElementById('dash-renewal').innerText = student.renewalDate || '---';
+            document.getElementById('dash-amount').innerText = `S/. ${student.paymentAmount.toFixed(2)}`;
+            calculateAttendance(student.id);
+            lucide.createIcons();
+        }
+
+        function calculateAttendance(studentId) {
+            let present = 0, late = 0, absent = 0;
+            if (window.systemData.attendanceData) {
+                Object.values(window.systemData.attendanceData).forEach(dayRecord => {
+                    const status = dayRecord[studentId];
+                    if (status === 'A') present++;
+                    else if (status === 'T') late++;
+                    else if (status === 'F') absent++;
+                });
+            }
+            const total = present + late + absent;
+            document.getElementById('stat-present').innerText = present;
+            document.getElementById('stat-late').innerText = late;
+            document.getElementById('stat-absent').innerText = absent;
+            if (total > 0) {
+                document.getElementById('bar-present').style.width = `${(present/total)*100}%`;
+                document.getElementById('bar-late').style.width = `${(late/total)*100}%`;
+                document.getElementById('bar-absent').style.width = `${(absent/total)*100}%`;
+            }
+        }
+        
+        window.onload = () => { lucide.createIcons(); }
+    </script>
+</body>
+</html>
