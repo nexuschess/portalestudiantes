@@ -68,7 +68,6 @@
                     <i data-lucide="arrow-right" class="w-5 h-5"></i>
                 </button>
             </form>
-            <!-- CAMBIO AQUÍ: ENLACE A WHATSAPP AUTOMÁTICO -->
             <p class="mt-8 text-center text-xs text-slate-400 font-medium">¿Problemas para ingresar? <a href="https://wa.me/51999999999?text=Hola%20Soporte%20Nexus%20Chess,%20tengo%20problemas%20para%20ingresar%20al%20aula%20virtual." target="_blank" class="text-blue-600 hover:underline font-bold transition-colors hover:text-blue-700">Contactar Soporte</a></p>
         </div>
     </div>
@@ -91,17 +90,12 @@
                     <span class="hidden lg:block">Panel de Control</span>
                 </a>
                 
-                <a href="#" onclick="alert('Próximamente')" class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
-                    <i data-lucide="trophy" class="w-5 h-5 group-hover:scale-110 transition-transform text-slate-400 group-hover:text-amber-500"></i>
-                    <span class="hidden lg:block">Torneos</span>
+                <!-- SECCIÓN PAGOS -->
+                <a href="#payment-section" onclick="document.getElementById('payment-section').scrollIntoView({behavior: 'smooth'})" class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
+                    <i data-lucide="credit-card" class="w-5 h-5 group-hover:scale-110 transition-transform text-slate-400 group-hover:text-emerald-500"></i>
+                    <span class="hidden lg:block">Mis Pagos</span>
                 </a>
 
-                 <a href="#" onclick="alert('Próximamente')" class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
-                    <i data-lucide="book-open" class="w-5 h-5 group-hover:scale-110 transition-transform text-slate-400 group-hover:text-purple-500"></i>
-                    <span class="hidden lg:block">Lecciones</span>
-                </a>
-
-                <!-- NUEVA OPCIÓN AÑADIDA -->
                 <a href="https://lichess.org/" target="_blank" class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
                     <i data-lucide="swords" class="w-5 h-5 group-hover:scale-110 transition-transform text-slate-400 group-hover:text-slate-900"></i>
                     <span class="hidden lg:block">Practicar (Lichess)</span>
@@ -145,7 +139,7 @@
                     <!-- COLUMNA IZQUIERDA (Perfil + Pagos) -->
                     <div class="w-full lg:w-80 flex flex-col gap-6 shrink-0 fade-in">
                         
-                        <!-- Tarjeta Perfil -->
+                        <!-- Tarjeta Perfil (SIN ELO) -->
                         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center relative overflow-hidden group">
                             <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-slate-100 to-slate-200 z-0"></div>
                             <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-4 border-[6px] border-white shadow-md relative z-10 text-3xl font-bold text-slate-300">
@@ -154,12 +148,8 @@
                             <div class="relative z-10 w-full">
                                 <h5 id="profile-fullname" class="font-bold text-slate-800 text-lg leading-tight mb-1">---</h5>
                                 <span class="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider rounded-full mb-4">Estudiante Activo</span>
-                                <div class="grid grid-cols-2 gap-2 w-full pt-4 border-t border-slate-50">
+                                <div class="w-full pt-4 border-t border-slate-50">
                                     <div class="text-center">
-                                        <div class="text-xs text-slate-400 font-semibold uppercase">Elo</div>
-                                        <div class="font-bold text-slate-700">1200</div>
-                                    </div>
-                                    <div class="text-center border-l border-slate-50">
                                         <div class="text-xs text-slate-400 font-semibold uppercase">Nivel</div>
                                         <div class="font-bold text-slate-700">Básico</div>
                                     </div>
@@ -167,8 +157,8 @@
                             </div>
                         </div>
 
-                        <!-- Tarjeta Pagos (AHORA A LA IZQUIERDA) -->
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow">
+                        <!-- Tarjeta Pagos -->
+                        <div id="payment-section" class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow">
                             <h4 class="font-bold text-slate-800 flex items-center gap-3 mb-5 text-sm uppercase tracking-wide">
                                 <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
                                     <i data-lucide="credit-card" class="w-4 h-4"></i>
