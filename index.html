@@ -93,13 +93,12 @@
                     <span class="hidden lg:block">Mis Pagos</span>
                 </button>
 
-                <!-- Botón Clases Grabadas vinculado directamente al Drive -->
-                <a href="https://drive.google.com/drive/folders/1BBPEQ5BsIYwOHJiqOezVPZ-jOtLjDiOq?usp=sharing" target="_blank" class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
+                <!-- BOTÓN DE GRABACIONES (DINÁMICO) -->
+                <a id="btn-recordings" href="#" target="_blank" class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
                     <i data-lucide="play-circle" class="w-5 h-5 group-hover:scale-110 transition-transform text-slate-400 group-hover:text-red-500"></i>
                     <span class="hidden lg:block">Clases Grabadas</span>
                 </a>
 
-                <!-- NUEVO BOTÓN: Libro Ejercicios -->
                 <a href="https://drive.google.com/drive/folders/1NQU77izbooxSF1Cp-0EqwbjGrcD6mHvR?usp=sharing" target="_blank" class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all font-medium text-sm group">
                     <i data-lucide="book-open" class="w-5 h-5 group-hover:scale-110 transition-transform text-slate-400 group-hover:text-blue-500"></i>
                     <span class="hidden lg:block">Libro Ejercicios</span>
@@ -454,12 +453,13 @@
             const modalityText = student.modality || 'Presencial'; 
             document.getElementById('dash-modality').innerText = `Modalidad ${modalityText}`;
             
-            // --- ENLACE DE CLASE (EN VIVO) ---
+            // --- LÓGICA DE AULA / SALÓN ---
             let classInfo = null;
             if (window.systemData.classrooms) {
                 classInfo = window.systemData.classrooms.find(c => c.id === student.assignedClassId);
             }
             
+            // 1. ENLACE DE CLASE (EN VIVO - MEET)
             const meetBtn = document.getElementById('btn-meet');
             if (classInfo && classInfo.meetLink && classInfo.meetLink.length > 5) {
                 meetBtn.href = classInfo.meetLink;
@@ -471,6 +471,19 @@
                 meetBtn.classList.add('opacity-50', 'pointer-events-none', 'bg-slate-400');
                 meetBtn.classList.remove('bg-slate-900', 'hover:bg-slate-800');
                 document.getElementById('no-link-msg').classList.remove('hidden');
+            }
+
+            // 2. ENLACE DE GRABACIONES (DRIVE) - NUEVO
+            const recordingsBtn = document.getElementById('btn-recordings');
+            // Link por defecto de respaldo
+            const fallbackLink = "https://drive.google.com/drive/folders/1BBPEQ5BsIYwOHJiqOezVPZ-jOtLjDiOq?usp=sharing";
+            
+            if (classInfo && classInfo.driveLink && classInfo.driveLink.length > 5) {
+                // Si el salón tiene un link configurado, úsalo
+                recordingsBtn.href = classInfo.driveLink;
+            } else {
+                // Si no, usa el link genérico o de respaldo
+                recordingsBtn.href = fallbackLink;
             }
 
             // --- PAGOS ---
