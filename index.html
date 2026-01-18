@@ -479,8 +479,8 @@
             }
         });
 
-        // ---------------- HELPER: IMAGE COMPRESSION ----------------
-        // Esta función reduce el tamaño de la imagen antes de subirla para que sea ultra rápido
+        // ---------------- HELPER: ULTRA FAST IMAGE COMPRESSION ----------------
+        // Optimizado para velocidad extrema: reduce resolución a 1000px y calidad a 0.5
         async function compressImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -492,7 +492,7 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const max_size = 1200; // Tamaño máximo razonable para fotos de tareas
+                        const max_size = 1000; // Reducido para mayor velocidad
                         
                         if (width > height) {
                             if (width > max_size) {
@@ -513,7 +513,7 @@
                         
                         canvas.toBlob((blob) => {
                             resolve(blob);
-                        }, 'image/jpeg', 0.7); // 70% de calidad es perfecto para tareas
+                        }, 'image/jpeg', 0.5); // Calidad 0.5 para subida instantánea
                     };
                 };
             });
@@ -741,7 +741,7 @@
             lucide.createIcons();
         }
 
-        // OPTIMIZADO: Subida en paralelo y compresión instantánea
+        // ULTRA FAST: Subida paralela con seguimiento de progreso real
         window.uploadTaskFiles = async function(taskId) {
             const files = window.selectedFiles[taskId];
             if (!files || files.length === 0) return;
@@ -751,17 +751,16 @@
             const progressFill = document.getElementById(`progress-fill-${taskId}`);
 
             btn.disabled = true;
-            btn.innerHTML = `<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-slate-400"></div> Optimizando y subiendo...`;
+            btn.innerHTML = `<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-slate-400"></div> Subiendo...`;
             progressBar.classList.remove('hidden');
-            progressFill.style.width = '10%'; // Empieza con algo de avance visual
-
+            
             const classId = window.currentUser.assignedClassId;
             const studentId = window.currentUser.id;
+            let completedCount = 0;
 
             try {
-                // Paso 1: Mapear archivos a promesas de carga (SUBIDA EN PARALELO)
+                // Paso 1: Mapear archivos a promesas de carga (SUBIDA EN PARALELO SIMULTÁNEA)
                 const uploadPromises = files.map(async (file, i) => {
-                    // Comprimir antes de subir (esto reduce el peso hasta un 80% sin perder calidad visual)
                     const compressedBlob = await compressImage(file);
                     
                     const fileName = `hw_${Date.now()}_${i}_${file.name.split('.')[0]}.jpg`;
@@ -770,14 +769,17 @@
                     const snapshot = await uploadBytes(fileRef, compressedBlob);
                     const url = await getDownloadURL(snapshot.ref);
                     
+                    // Actualizar progreso visual por cada archivo terminado
+                    completedCount++;
+                    progressFill.style.width = `${(completedCount / files.length) * 100}%`;
+                    
                     return { url, name: file.name };
                 });
 
-                // Ejecutar todas las cargas al mismo tiempo
+                // Ejecutar todas las cargas en paralelo (máxima velocidad de red)
                 const uploadedFiles = await Promise.all(uploadPromises);
-                progressFill.style.width = '80%';
 
-                // Paso 2: Actualizar la base de datos
+                // Paso 2: Actualización de base de datos ultra rápida
                 const submissionRef = ref(db, `academy_v1/tasks/${classId}/${taskId}/submissions/${studentId}`);
                 await update(submissionRef, {
                     status: 'ENTREGADO',
@@ -786,22 +788,20 @@
                     studentName: window.currentUser.studentName
                 });
 
-                progressFill.style.width = '100%';
                 delete window.selectedFiles[taskId];
                 
-                // Pequeña pausa para que el usuario vea el 100%
+                // Éxito instantáneo
                 setTimeout(() => {
-                    alert(`¡Éxito! Se han subido ${uploadedFiles.length} imágenes correctamente.`);
+                    alert(`¡Tarea enviada con éxito!`);
                     renderTasks();
-                }, 500);
+                }, 100);
 
             } catch (error) {
                 console.error(error);
-                alert("Hubo un problema al subir los archivos. Por favor, intenta de nuevo.");
+                alert("Error de red. Intenta de nuevo.");
                 btn.disabled = false;
                 btn.innerHTML = `<span>Reintentar</span> <i data-lucide="upload-cloud" class="w-4 h-4"></i>`;
                 progressBar.classList.add('hidden');
-                progressFill.style.width = '0%';
             }
         }
 
