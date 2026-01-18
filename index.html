@@ -666,17 +666,22 @@
         window.renderTasks = function() {
             const container = document.getElementById('tasks-container');
             const emptyState = document.getElementById('tasks-empty');
+            
             if(!window.currentUser || !window.currentUser.assignedClassId) {
                 container.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 return;
             }
+
             const classId = window.currentUser.assignedClassId;
             const allTasks = window.systemData.tasks ? (window.systemData.tasks[classId] || {}) : {};
             const taskIds = Object.keys(allTasks).sort().reverse();
+            
             container.innerHTML = '';
-            if(taskIds.length === 0) emptyState.classList.remove('hidden');
-            else {
+            
+            if(taskIds.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
                 emptyState.classList.add('hidden');
                 taskIds.forEach(taskId => {
                     const task = allTasks[taskId];
@@ -684,6 +689,15 @@
                     const submission = (task.submissions && task.submissions[studentId]) ? task.submissions[studentId] : null;
                     const status = submission ? submission.status : 'PENDIENTE';
                     let statusBadge = '', actionArea = '', cardBorder = 'border-slate-200';
+
+                    // --- NUEVO: Mostrar descripción si existe ---
+                    const descriptionHtml = task.description 
+                        ? `<div class="bg-slate-50 p-4 rounded-xl text-sm text-slate-600 mb-4 border border-slate-100 leading-relaxed">
+                             <span class="font-bold text-slate-700 block mb-1 text-xs uppercase tracking-wide">Instrucciones:</span>
+                             ${task.description}
+                           </div>` 
+                        : '';
+                    // --------------------------------------------
 
                     if (status === 'PENDIENTE' || status === 'OBSERVADO') {
                         const isObserved = status === 'OBSERVADO';
@@ -723,15 +737,27 @@
                         cardBorder = 'border-emerald-200 bg-emerald-50/20';
                         actionArea = `<div class="mt-4 pt-4 border-t border-emerald-100"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold text-emerald-600 uppercase">Calificación</span><span class="text-lg font-bold text-emerald-700">${submission.grade || '20'}</span></div>${submission.feedback ? `<p class="text-sm text-slate-600 bg-white/50 p-3 rounded-lg border border-emerald-100 italic">"${submission.feedback}"</p>` : ''}<div class="flex flex-wrap gap-2 mt-2">${(submission.files || [{url: submission.fileUrl}]).map((f, i) => `<a href="${f.url}" target="_blank" class="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-1 rounded font-bold border border-emerald-100">Foto ${i+1}</a>`).join('')}</div></div>`;
                     }
+                    
                     const card = document.createElement('div');
                     card.className = `bg-white p-6 rounded-2xl border ${cardBorder} shadow-sm transition-all`;
-                    card.innerHTML = `<div class="flex justify-between items-start mb-3"><div><h3 class="text-lg font-bold text-slate-800">${task.title}</h3><p class="text-xs text-slate-500 font-medium">Vence: ${task.date}</p></div>${statusBadge}</div>${actionArea}`;
+                    
+                    // --- Aquí se inyecta la descripción y el área de acción ---
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">${task.title}</h3>
+                                <p class="text-xs text-slate-500 font-medium">Vence: ${task.date}</p>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        ${descriptionHtml} 
+                        ${actionArea}
+                    `;
                     container.appendChild(card);
                 });
             }
             lucide.createIcons();
         }
-
         // ULTRA RÁPIDO: Subida corregida compatible con Admin y Alumno
         window.uploadTaskFiles = async function(taskId) {
             const files = window.selectedFiles[taskId];
