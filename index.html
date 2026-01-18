@@ -16,11 +16,13 @@
         .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
+        /* Scrollbar elegante */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
+        /* Calendar Styles */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .calendar-day { 
             aspect-ratio: 1; 
@@ -35,102 +37,420 @@
             position: relative;
             cursor: default;
         }
+        .calendar-day:hover:not(.empty):not(.active-status) { background-color: #f1f5f9; color: #0f172a; transform: scale(1.05); }
+        .calendar-head { text-align: center; font-size: 0.7rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; padding-bottom: 10px; letter-spacing: 0.05em; }
 
+        /* Estados de Asistencia */
+        .status-pending { background-color: #0f172a; color: white; box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.3); } 
         .status-present { background-color: #10b981; color: white; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3); } 
         .status-late { background-color: #f59e0b; color: white; box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.3); } 
         .status-absent { background-color: #ef4444; color: white; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3); } 
 
         .sidebar-link { transition: all 0.2s ease; border-left: 3px solid transparent; }
         .sidebar-link:hover, .sidebar-link.active { background-color: rgba(255,255,255,0.05); border-left-color: #3b82f6; color: white; }
+        .sidebar-link i { transition: transform 0.2s; }
+        .sidebar-link:hover i { transform: translateX(2px); }
+
+        /* Group Chat Specifics */
+        .msg-bubble-self { background-color: #2563eb; color: white; border-radius: 16px 16px 0 16px; margin-left: auto; max-width: 80%; }
+        .msg-bubble-other { background-color: #f1f5f9; color: #1e293b; border-radius: 16px 16px 16px 0; margin-right: auto; max-width: 80%; }
         
+        /* Mobile Sidebar Transitions */
+        .sidebar-mobile-open { transform: translateX(0) !important; }
+        .backdrop-visible { opacity: 1 !important; pointer-events: auto !important; }
+
+        /* Drag and Drop Zone */
         .upload-zone.dragover { background-color: #eff6ff; border-color: #3b82f6; border-style: solid; }
+        
+        /* Preview grid */
         .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
     </style>
 </head>
 <body class="text-slate-600 h-screen overflow-hidden flex flex-col antialiased selection:bg-blue-600 selection:text-white">
 
+    <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 z-[60] flex bg-white">
         <div class="hidden lg:flex lg:w-1/2 relative bg-slate-900 overflow-hidden items-center justify-center">
             <div class="absolute inset-0 opacity-40">
                 <img src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?q=80&w=2071&auto=format&fit=crop" class="w-full h-full object-cover">
             </div>
             <div class="absolute inset-0 bg-gradient-to-tr from-slate-900 via-slate-900/80 to-blue-900/40"></div>
+            
             <div class="relative z-10 text-center p-12">
                 <div class="w-32 h-32 mx-auto mb-8 bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center border border-white/10 shadow-2xl">
                     <img src="https://i.postimg.cc/7ZMDp79f/LOGO-PNG-NEXUS-CHESS-sin-letras.png" class="w-20 h-20 object-contain drop-shadow-md">
                 </div>
                 <h1 class="text-5xl font-bold text-white font-oswald tracking-wide mb-4">NEXUS CHESS</h1>
-                <p class="text-blue-200 text-lg max-w-md mx-auto leading-relaxed">Domina el tablero. Conéctate con tu futuro.</p>
+                <p class="text-blue-200 text-lg max-w-md mx-auto leading-relaxed">Domina el tablero. Conéctate con tu futuro. La plataforma definitiva para estudiantes de ajedrez.</p>
             </div>
         </div>
 
         <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-slate-50">
             <div class="w-full max-w-md bg-white p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 fade-in">
+                <div class="lg:hidden text-center mb-8">
+                    <img src="https://i.postimg.cc/7ZMDp79f/LOGO-PNG-NEXUS-CHESS-sin-letras.png" class="w-16 h-16 mx-auto mb-4">
+                    <h2 class="text-2xl font-bold font-oswald text-slate-900">NEXUS CHESS</h2>
+                </div>
+                
                 <div class="mb-8">
                     <h2 class="text-2xl font-bold text-slate-900">Bienvenido de nuevo</h2>
                     <p class="text-slate-500 text-sm mt-1">Ingresa tus credenciales para acceder al aula.</p>
                 </div>
+
                 <form id="login-form" class="space-y-5">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Código de Estudiante</label>
-                        <input type="text" id="login-code" placeholder="Ej: NX-AIDU" class="w-full pl-4 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium">
+                        <div class="relative">
+                            <i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+                            <input type="text" id="login-code" placeholder="Ej: STU-2024" class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-medium text-slate-900 placeholder-slate-400">
+                        </div>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Contraseña</label>
-                        <input type="password" id="login-pass" placeholder="Tu DNI" class="w-full pl-4 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium">
+                        <div class="relative">
+                            <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+                            <input type="password" id="login-pass" placeholder="Tu DNI o clave de acceso" class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-medium text-slate-900 placeholder-slate-400">
+                        </div>
                     </div>
-                    <div id="login-error" class="hidden p-3 rounded-lg bg-red-50 text-red-600 text-xs font-bold">Credenciales incorrectas</div>
-                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg transition-all">Ingresar al Portal</button>
+
+                    <div id="login-error" class="hidden p-3 rounded-lg bg-red-50 text-red-600 text-xs font-bold flex items-center gap-2">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i> Credenciales incorrectas
+                    </div>
+
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg shadow-slate-900/20 transition-all flex items-center justify-center gap-2 group">
+                        <span>Ingresar al Portal</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
                 </form>
+
+                <p class="mt-8 text-center text-xs text-slate-400">
+                    &copy; 2024 Nexus Chess Academy. Todos los derechos reservados.
+                </p>
             </div>
         </div>
     </div>
 
+    <!-- MAIN APP INTERFACE -->
     <div id="main-app" class="hidden flex h-full bg-[#f8fafc] relative">
-        <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 flex flex-col h-full lg:translate-x-0 transition-transform duration-300">
-             <div class="h-20 flex items-center gap-3 px-6 border-b border-slate-800">
-                <img src="https://i.postimg.cc/7ZMDp79f/LOGO-PNG-NEXUS-CHESS-sin-letras.png" class="w-8 h-8 brightness-0 invert">
+        <div id="mobile-backdrop" onclick="toggleMobileMenu(false)" class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden"></div>
+
+        <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 flex flex-col h-full transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-2xl shadow-slate-900/50">
+            <div class="h-20 flex items-center gap-3 px-6 border-b border-slate-800 relative">
+                <img src="https://i.postimg.cc/7ZMDp79f/LOGO-PNG-NEXUS-CHESS-sin-letras.png" class="w-8 h-8 object-contain brightness-0 invert">
                 <span class="font-bold text-white font-oswald text-xl tracking-wider">NEXUS CHESS</span>
+                <button onclick="toggleMobileMenu(false)" class="lg:hidden absolute right-4 text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
             </div>
-            <div class="flex-1 py-6 px-3 space-y-1">
-                <button onclick="showSection('home')" id="nav-home" class="sidebar-link active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">Dashboard</button>
-                <button onclick="showSection('tasks')" id="nav-tasks" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">Tareas</button>
+
+            <div class="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
+                <p class="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Principal</p>
+                <button onclick="showSection('home'); toggleMobileMenu(false)" id="nav-home" class="sidebar-link active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i data-lucide="layout-grid" class="w-5 h-5"></i> Dashboard
+                </button>
+                <button onclick="showSection('payments'); toggleMobileMenu(false)" id="nav-payments" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i data-lucide="credit-card" class="w-5 h-5"></i> Pagos
+                </button>
+                <button onclick="showSection('chat'); toggleMobileMenu(false)" id="nav-chat" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i> Chat Grupal
+                </button>
+                <p class="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 mt-6">Herramientas</p>
+                <a href="https://lichess.org/" target="_blank" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i data-lucide="swords" class="w-5 h-5"></i> Lichess
+                </a>
+                <a id="side-recordings" href="#" target="_blank" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i data-lucide="video" class="w-5 h-5"></i> Clases Grabadas
+                </a>
+                <a href="https://drive.google.com/drive/folders/1NQU77izbooxSF1Cp-0EqwbjGrcD6mHvR?usp=sharing" target="_blank" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i data-lucide="book-open" class="w-5 h-5"></i> Material de Estudio
+                </a>
+                <button onclick="showSection('tasks'); toggleMobileMenu(false)" id="nav-tasks" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i data-lucide="clipboard-list" class="w-5 h-5"></i> Tareas
+                </button>
             </div>
-            <div class="p-4 border-t border-slate-800">
-                <button onclick="logout()" class="w-full py-2 rounded-lg bg-slate-800 text-slate-400 text-xs font-bold uppercase">Cerrar Sesión</button>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-900/50">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-900/50">
+                        <span id="user-initials">ST</span>
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <h4 id="sidebar-name" class="text-sm font-bold text-white truncate">Estudiante</h4>
+                        <p id="sidebar-code" class="text-xs text-slate-500 truncate">STU-0000</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-slate-800 hover:bg-red-900/30 text-slate-400 hover:text-red-400 transition-colors text-xs font-bold uppercase tracking-wide">
+                    <i data-lucide="log-out" class="w-3 h-3"></i> Cerrar Sesión
+                </button>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col h-full lg:ml-64 relative">
-            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
-                <div class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-xs font-bold uppercase tracking-wide">Estado: Activo</span>
+        <main class="flex-1 flex flex-col h-full lg:ml-64 relative transition-all duration-300">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 lg:px-8 sticky top-0 z-20">
+                <div class="flex items-center gap-4 lg:hidden">
+                    <button onclick="toggleMobileMenu(true)" class="p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                    <img src="https://i.postimg.cc/7ZMDp79f/LOGO-PNG-NEXUS-CHESS-sin-letras.png" class="w-8 h-8 object-contain">
+                </div>
+                <div class="flex-1"></div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-xs font-bold uppercase tracking-wide">Estado: Activo</span>
+                    </div>
+                    <button class="relative p-2 text-slate-400 hover:text-slate-600 transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                    </button>
                 </div>
             </header>
 
-            <div class="flex-1 overflow-y-auto p-8">
+            <div class="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
+                <!-- HOME SECTION -->
                 <div id="section-home" class="max-w-6xl mx-auto space-y-8 fade-in">
-                    <h2 class="text-3xl font-bold font-oswald">¡Hola, <span id="welcome-name">Campeón</span>! 👋</h2>
+                    <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="relative z-10">
+                            <h2 class="text-3xl font-bold font-oswald mb-2">¡Hola, <span id="welcome-name">Campeón</span>! 👋</h2>
+                            <p class="text-slate-300 text-sm max-w-lg">
+                                Tienes <span class="text-white font-bold underline decoration-blue-500 underline-offset-4">nuevas actividades</span> pendientes. Revisa tu progreso y prepárate para la próxima clase.
+                            </p>
+                        </div>
+                        <div class="absolute right-0 top-0 w-64 h-64 bg-blue-600 rounded-full blur-[100px] opacity-30 pointer-events-none"></div>
+                        <img src="https://i.postimg.cc/xTd0NgKW/NEXUS-CHESS-BLANCO.png" class="absolute -left-10 -bottom-20 w-64 h-64 opacity-5 rotate-12 pointer-events-none">
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 space-y-8">
+                            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 relative overflow-hidden">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                        <i data-lucide="monitor" class="w-5 h-5 text-purple-600"></i> Sala de Clases
+                                    </h3>
+                                    <span id="dash-modality" class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full uppercase">---</span>
+                                </div>
+                                <div class="flex flex-col md:flex-row items-center gap-6">
+                                    <div class="flex-1 w-full">
+                                        <div id="dash-schedule" class="text-2xl font-bold text-slate-800 mb-4">---</div>
+                                        <a id="btn-meet" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-xl transition-all w-full md:w-auto shadow-lg shadow-purple-600/20">
+                                            <i data-lucide="video" class="w-4 h-4"></i> Ingresar a Clase en Vivo
+                                        </a>
+                                        <div id="no-link-msg" class="text-xs text-red-500 mt-2 hidden font-medium flex items-center gap-1">
+                                            <i data-lucide="alert-circle" class="w-3 h-3"></i> Enlace no disponible
+                                        </div>
+                                    </div>
+                                    <div class="hidden md:block w-px h-24 bg-slate-100"></div>
+                                    <div class="w-full md:w-1/3 text-center md:text-left">
+                                        <p class="text-sm text-slate-500 leading-relaxed">
+                                            Recuerda ingresar 5 minutos antes. Si tienes problemas técnicos, contacta a soporte.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 relative">
+                                <div class="flex justify-between items-start mb-6">
+                                    <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                        <i data-lucide="bar-chart-2" class="w-5 h-5 text-blue-600"></i> Resumen de Asistencia
+                                    </h3>
+                                </div>
+                                <div class="flex flex-col sm:flex-row items-center justify-around gap-8">
+                                    <div class="relative w-32 h-32">
+                                        <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                                            <path class="text-slate-100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                                            <path id="ring-present" class="text-blue-600 transition-all duration-1000 ease-out" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                                        </svg>
+                                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                            <span id="stat-present-percent" class="text-2xl font-bold text-slate-800">0%</span>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4 w-full sm:w-auto">
+                                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                            <div id="stat-present" class="text-xl font-bold text-slate-800">0</div>
+                                            <div class="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
+                                                <div class="w-2 h-2 bg-emerald-500 rounded-full"></div> Asistencias
+                                            </div>
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                            <div id="stat-late" class="text-xl font-bold text-slate-800">0</div>
+                                            <div class="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
+                                                <div class="w-2 h-2 bg-amber-500 rounded-full"></div> Tardanzas
+                                            </div>
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 col-span-2">
+                                            <div id="stat-absent" class="text-xl font-bold text-slate-800">0</div>
+                                            <div class="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
+                                                <div class="w-2 h-2 bg-red-500 rounded-full"></div> Faltas Totales
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-8">
+                            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-bold text-slate-800 text-sm tracking-wide uppercase">ENERO 2026</h3>
+                                    <div class="bg-slate-100 p-2 rounded-full">
+                                        <i data-lucide="calendar" class="w-4 h-4 text-slate-500"></i>
+                                    </div>
+                                </div>
+                                <div class="calendar-grid mb-2">
+                                    <div class="calendar-head">L</div>
+                                    <div class="calendar-head">M</div>
+                                    <div class="calendar-head">X</div>
+                                    <div class="calendar-head">J</div>
+                                    <div class="calendar-head">V</div>
+                                    <div class="calendar-head">S</div>
+                                    <div class="calendar-head">D</div>
+                                </div>
+                                <div id="calendar-days" class="calendar-grid"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
+                <!-- PAYMENTS SECTION -->
+                <div id="section-payments" class="hidden max-w-4xl mx-auto fade-in h-full flex-col justify-center">
+                     <div class="bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden">
+                        <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <div>
+                                <h2 class="text-2xl font-bold text-slate-800">Estado Financiero</h2>
+                                <p class="text-slate-500 text-sm">Resumen de cuenta y próximos pagos</p>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
+                                <i data-lucide="check" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="p-8 grid md:grid-cols-2 gap-12">
+                            <div>
+                                <div class="mb-6">
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Último Pago</span>
+                                    <div class="flex items-baseline gap-1 mt-1">
+                                        <span class="text-3xl font-bold text-slate-800">S/. <span id="dash-amount">0.00</span></span>
+                                        <span class="text-sm text-slate-500">PEN</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center p-4 rounded-2xl bg-white border border-slate-100 hover:border-slate-200 transition-colors">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                            <span class="text-sm font-bold text-slate-600">Próximo Vencimiento</span>
+                                        </div>
+                                        <span id="dash-renewal-pay" class="text-sm font-bold text-slate-800 bg-slate-100 px-4 py-2 rounded-xl">---</span>
+                                    </div>
+                                    <div class="flex justify-between items-center p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                                        <span class="text-sm font-medium text-emerald-700">Estado</span>
+                                        <span class="text-xs font-bold bg-emerald-200 text-emerald-800 px-2 py-1 rounded">AL DÍA</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-slate-900 rounded-2xl p-6 text-white relative overflow-hidden">
+                                <div class="relative z-10">
+                                    <h4 class="font-bold mb-4 flex items-center gap-2">
+                                        <i data-lucide="landmark" class="w-4 h-4 text-slate-400"></i> Cuentas Bancarias
+                                    </h4>
+                                    <div class="space-y-3 text-sm">
+                                        <div class="p-3 bg-white/5 rounded-lg border border-white/10">
+                                            <div class="text-xs text-slate-400">BCP Soles</div>
+                                            <div class="font-mono tracking-wide mt-1">Próximamente</div>
+                                        </div>
+                                        <div onclick="toggleQR(true)" class="p-3 bg-white/5 rounded-lg border border-white/10 cursor-pointer hover:bg-white/10 transition-all duration-300 group">
+                                            <div class="flex justify-between items-center">
+                                                <div>
+                                                    <div class="text-xs text-slate-400 group-hover:text-white transition-colors">Yape</div>
+                                                    <div class="font-mono tracking-wide mt-1 text-lg font-bold text-white">983 290 098</div>
+                                                </div>
+                                                <i data-lucide="qr-code" class="w-5 h-5 text-slate-400 group-hover:text-emerald-400 transition-colors"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+
+                <!-- CHAT GRUPAL SECTION -->
+                <div id="section-chat" class="hidden h-full flex flex-col fade-in">
+                    <div class="flex-none p-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+                        <div class="flex justify-between items-center max-w-5xl mx-auto">
+                            <div>
+                                <h2 class="text-2xl font-bold text-slate-800 font-oswald flex items-center gap-2">
+                                    <i data-lucide="messages-square" class="w-6 h-6 text-blue-600"></i> Chat del Grupo
+                                </h2>
+                                <p class="text-sm text-slate-500">Conéctate con tus compañeros de clase</p>
+                            </div>
+                            <div class="bg-blue-50 px-3 py-1 rounded-full border border-blue-100 text-xs font-bold text-blue-600 uppercase tracking-wide">En Vivo</div>
+                        </div>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-6 bg-slate-50" id="group-chat-container">
+                        <div class="max-w-5xl mx-auto space-y-4" id="group-chat-messages">
+                            <div class="flex flex-col items-center justify-center h-full text-slate-400 py-10">
+                                <i data-lucide="message-square-dashed" class="w-12 h-12 mb-2 opacity-50"></i>
+                                <p class="text-sm">Cargando mensajes del grupo...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-none p-4 bg-white border-t border-slate-200">
+                        <div class="max-w-5xl mx-auto flex gap-3">
+                            <input type="text" id="group-chat-input" placeholder="Escribe un mensaje a tu grupo..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" onkeypress="handleGroupChatEnter(event)">
+                            <button onclick="sendGroupMessage()" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center">
+                                <i data-lucide="send" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION TAREAS -->
                 <div id="section-tasks" class="hidden max-w-5xl mx-auto fade-in space-y-6">
-                    <div class="bg-white rounded-2xl p-8 border border-slate-100 shadow-sm">
-                        <h2 class="text-2xl font-bold text-slate-800 font-oswald">Mis Tareas</h2>
-                        <p class="text-slate-500 text-sm">Sube tus evidencias reales aquí.</p>
+                    <div class="bg-white rounded-2xl p-8 border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800 font-oswald">Mis Tareas</h2>
+                            <p class="text-slate-500 text-sm">Sube tus evidencias y revisa tus calificaciones</p>
+                        </div>
+                        <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center">
+                            <i data-lucide="folder-open" class="w-6 h-6"></i>
+                        </div>
                     </div>
                     <div id="tasks-container" class="space-y-4"></div>
+                    <div id="tasks-empty" class="hidden flex flex-col items-center justify-center py-12 text-slate-400">
+                        <i data-lucide="clipboard-check" class="w-16 h-16 mb-4 opacity-30"></i>
+                        <p class="font-medium">¡Estás al día! No hay tareas pendientes.</p>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
+    <!-- QR MODAL -->
+    <div id="qr-modal" class="fixed inset-0 z-[70] hidden flex items-center justify-center">
+        <div id="qr-backdrop" class="absolute inset-0 bg-slate-900/60 backdrop-blur-md opacity-0 transition-opacity duration-500 ease-out" onclick="toggleQR(false)"></div>
+        <div id="qr-content" class="relative bg-white rounded-3xl p-6 shadow-2xl w-full max-w-sm mx-4 flex flex-col items-center opacity-0 scale-95 translate-y-4 transition-all duration-500 ease-out">
+            <button onclick="toggleQR(false)" class="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-2xl font-bold text-slate-800 font-oswald mb-2 mt-2">Yape</h3>
+            <p class="text-slate-500 text-sm mb-6">Escanea para realizar el pago</p>
+            <div class="bg-white p-2 rounded-xl border-2 border-slate-100 shadow-inner mb-4">
+                <img src="https://i.postimg.cc/BvsZftrZ/Whats-App-Image-2026-01-13-at-11-09-07-PM.jpg" alt="QR Yape" class="w-64 h-64 object-contain rounded-lg">
+            </div>
+            <div class="text-center">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Titular</p>
+                <p class="text-lg font-bold text-slate-800">Giomar Romero</p>
+                <p class="text-emerald-500 font-mono font-bold mt-1">983 290 098</p>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onValue, push, set, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // TU CONFIGURACIÓN OFICIAL
         const firebaseConfig = {
             apiKey: "AIzaSyB_JqJuavM7TBvnuWtFW55wxqFSWMxrk3Q",
             authDomain: "nexus-chess-base-general.firebaseapp.com",
@@ -148,10 +468,10 @@
 
         window.systemData = null;
         window.currentUser = null;
-        window.selectedFiles = {};
+        window.selectedFiles = {}; // Store array of files per taskId
 
-        // Escucha de datos
-        onValue(ref(db, 'academy_v1'), (snapshot) => {
+        const dbRef = ref(db, 'academy_v1');
+        onValue(dbRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 window.systemData = data;
@@ -159,7 +479,267 @@
             }
         });
 
-        // --- FUNCIÓN DE SUBIDA CORREGIDA: TOKEN AUTOMÁTICO ---
+        // ---------------- HELPER: ULTRA FAST IMAGE COMPRESSION ----------------
+        async function compressImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const max_size = 800; // Limite más estricto para subida instantánea
+                        
+                        if (width > height) {
+                            if (width > max_size) {
+                                height *= max_size / width;
+                                width = max_size;
+                            }
+                        } else {
+                            if (height > max_size) {
+                                width *= max_size / height;
+                                height = max_size;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        canvas.toBlob((blob) => {
+                            resolve(blob);
+                            // Liberar memoria
+                            img.src = "";
+                        }, 'image/jpeg', 0.4); // Calidad 0.4: Máxima velocidad y legibilidad perfecta
+                    };
+                };
+            });
+        }
+
+        // ---------------- MOBILE MENU LOGIC ----------------
+        window.toggleMobileMenu = function(show) {
+            const sidebar = document.getElementById('app-sidebar');
+            const backdrop = document.getElementById('mobile-backdrop');
+            if (show) {
+                sidebar.classList.add('sidebar-mobile-open');
+                backdrop.classList.remove('hidden');
+                setTimeout(() => backdrop.classList.add('backdrop-visible'), 10);
+            } else {
+                sidebar.classList.remove('sidebar-mobile-open');
+                backdrop.classList.remove('backdrop-visible');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+        }
+
+        // ---------------- GROUP CHAT LOGIC ----------------
+        window.initGroupChat = function() {
+            if (!window.currentUser || !window.currentUser.assignedClassId) return;
+            const classId = window.currentUser.assignedClassId;
+            const chatRef = ref(db, `group_chats/${classId}`);
+            onValue(chatRef, (snapshot) => {
+                const messages = snapshot.val();
+                const container = document.getElementById('group-chat-messages');
+                container.innerHTML = '';
+                if (!messages) {
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full text-slate-400 py-10 opacity-70">
+                            <i data-lucide="message-square" class="w-12 h-12 mb-2"></i>
+                            <p class="text-sm">Aún no hay mensajes. ¡Sé el primero en saludar!</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+                Object.values(messages).forEach(msg => {
+                    const isSelf = msg.studentId === window.currentUser.id;
+                    const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const bubble = document.createElement('div');
+                    bubble.className = `flex w-full ${isSelf ? 'justify-end' : 'justify-start'}`;
+                    const initials = msg.senderName.substring(0, 2).toUpperCase();
+                    bubble.innerHTML = `
+                        <div class="flex max-w-[80%] ${isSelf ? 'flex-row-reverse' : 'flex-row'} gap-3">
+                            <div class="w-8 h-8 rounded-full ${isSelf ? 'bg-blue-600' : 'bg-slate-400'} flex items-center justify-center text-white text-[10px] font-bold shrink-0 shadow-sm border-2 border-white">${initials}</div>
+                            <div class="flex flex-col ${isSelf ? 'items-end' : 'items-start'}">
+                                <span class="text-[10px] text-slate-400 mb-1 ml-1">${msg.senderName}</span>
+                                <div class="px-4 py-2.5 shadow-sm text-sm ${isSelf ? 'msg-bubble-self' : 'msg-bubble-other'}">${msg.text}</div>
+                                <span class="text-[9px] text-slate-300 mt-1 mx-1">${time}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(bubble);
+                });
+                const scrollContainer = document.getElementById('group-chat-container');
+                scrollContainer.scrollTop = scrollContainer.scrollHeight;
+            });
+        }
+
+        window.handleGroupChatEnter = (e) => { if (e.key === 'Enter') sendGroupMessage(); }
+        window.sendGroupMessage = function() {
+            const input = document.getElementById('group-chat-input');
+            const text = input.value.trim();
+            if (!text || !window.currentUser) return;
+            const classId = window.currentUser.assignedClassId;
+            const chatRef = ref(db, `group_chats/${classId}`);
+            push(chatRef, { studentId: window.currentUser.id, senderName: window.currentUser.studentName, text, timestamp: Date.now() });
+            input.value = '';
+        }
+
+        // ---------------- TASK & FILE UPLOAD LOGIC ----------------
+        
+        window.handleFileSelect = function(event, taskId) {
+            const files = event.target.files;
+            processSelectedFiles(files, taskId);
+        }
+
+        window.handleDragOver = function(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('dragover');
+        }
+
+        window.handleDragLeave = function(event) {
+            event.currentTarget.classList.remove('dragover');
+        }
+
+        window.handleDrop = function(event, taskId) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('dragover');
+            if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+                processSelectedFiles(event.dataTransfer.files, taskId);
+                event.dataTransfer.clearData();
+            }
+        }
+
+        function processSelectedFiles(fileList, taskId) {
+            if (!window.selectedFiles[taskId]) window.selectedFiles[taskId] = [];
+            
+            const newFiles = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+            if (newFiles.length === 0) return;
+
+            window.selectedFiles[taskId] = [...window.selectedFiles[taskId], ...newFiles];
+            updatePreviewUI(taskId);
+        }
+
+        function updatePreviewUI(taskId) {
+            const container = document.getElementById(`preview-container-${taskId}`);
+            const grid = document.getElementById(`preview-grid-${taskId}`);
+            const uploadHint = document.getElementById(`upload-hint-${taskId}`);
+            const btnUpload = document.getElementById(`btn-upload-${taskId}`);
+            const files = window.selectedFiles[taskId] || [];
+
+            grid.innerHTML = '';
+            
+            if (files.length > 0) {
+                container.classList.remove('hidden');
+                uploadHint.classList.add('hidden');
+                btnUpload.disabled = false;
+                btnUpload.classList.remove('bg-slate-200', 'text-slate-400', 'cursor-not-allowed');
+                btnUpload.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'shadow-lg', 'shadow-blue-600/20');
+
+                files.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const item = document.createElement('div');
+                        item.className = 'relative aspect-square bg-slate-100 rounded-lg overflow-hidden border border-slate-200';
+                        item.innerHTML = `
+                            <img src="${e.target.result}" class="w-full h-full object-cover">
+                            <button onclick="removeFile(event, '${taskId}', ${index})" class="absolute top-1 right-1 bg-red-500/80 text-white p-0.5 rounded-full hover:bg-red-600 transition-colors shadow-sm">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
+                        `;
+                        grid.appendChild(item);
+                        lucide.createIcons();
+                    };
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                container.classList.add('hidden');
+                uploadHint.classList.remove('hidden');
+                btnUpload.disabled = true;
+                btnUpload.classList.add('bg-slate-200', 'text-slate-400', 'cursor-not-allowed');
+                btnUpload.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'shadow-lg', 'shadow-blue-600/20');
+            }
+        }
+
+        window.removeFile = function(event, taskId, index) {
+            event.stopPropagation();
+            window.selectedFiles[taskId].splice(index, 1);
+            updatePreviewUI(taskId);
+        }
+
+        window.renderTasks = function() {
+            const container = document.getElementById('tasks-container');
+            const emptyState = document.getElementById('tasks-empty');
+            if(!window.currentUser || !window.currentUser.assignedClassId) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            const classId = window.currentUser.assignedClassId;
+            const allTasks = window.systemData.tasks ? (window.systemData.tasks[classId] || {}) : {};
+            const taskIds = Object.keys(allTasks).sort().reverse();
+            container.innerHTML = '';
+            if(taskIds.length === 0) emptyState.classList.remove('hidden');
+            else {
+                emptyState.classList.add('hidden');
+                taskIds.forEach(taskId => {
+                    const task = allTasks[taskId];
+                    const studentId = window.currentUser.id;
+                    const submission = (task.submissions && task.submissions[studentId]) ? task.submissions[studentId] : null;
+                    const status = submission ? submission.status : 'PENDIENTE';
+                    let statusBadge = '', actionArea = '', cardBorder = 'border-slate-200';
+
+                    if (status === 'PENDIENTE' || status === 'OBSERVADO') {
+                        const isObserved = status === 'OBSERVADO';
+                        statusBadge = `<span class="${isObserved ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-600'} text-xs font-bold px-3 py-1 rounded-full uppercase">${isObserved ? 'Observado' : 'Pendiente'}</span>`;
+                        cardBorder = isObserved ? 'border-red-200 bg-red-50/20' : 'border-slate-200';
+                        actionArea = `
+                            <div class="mt-4 pt-4 border-t ${isObserved ? 'border-red-100' : 'border-slate-100'}">
+                                ${isObserved ? `<div class="flex items-center gap-2 text-red-600 font-bold text-sm mb-2"><i data-lucide="alert-circle" class="w-4 h-4"></i> Requiere corrección</div>${task.submissions[studentId].feedback ? `<p class="text-sm text-slate-600 bg-white/50 p-3 rounded-lg border border-red-100 italic mb-3">"${task.submissions[studentId].feedback}"</p>` : ''}` : `<label class="block text-xs font-bold text-slate-500 uppercase mb-2">Subir Evidencias (Fotos)</label>`}
+                                <input type="file" id="file-input-${taskId}" class="hidden" accept="image/*" multiple onchange="handleFileSelect(event, '${taskId}')">
+                                <div id="drop-zone-${taskId}" class="upload-zone border-2 border-dashed ${isObserved ? 'border-red-300 bg-white/50' : 'border-slate-300'} rounded-xl p-6 text-center cursor-pointer hover:bg-slate-50 transition-colors relative group" onclick="document.getElementById('file-input-${taskId}').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, '${taskId}')">
+                                    <div id="preview-container-${taskId}" class="hidden absolute inset-0 bg-white rounded-xl overflow-y-auto p-4 z-10 custom-scrollbar">
+                                        <div id="preview-grid-${taskId}" class="preview-grid"></div>
+                                        <div class="mt-3 text-[10px] text-slate-400 font-bold uppercase tracking-wider">Toca para añadir más fotos</div>
+                                    </div>
+                                    <div id="upload-hint-${taskId}" class="pointer-events-none">
+                                        <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform"><i data-lucide="images" class="w-6 h-6"></i></div>
+                                        <p class="text-sm font-bold text-slate-600">Sube una o varias fotos</p>
+                                        <p class="text-xs text-slate-400 mt-1">Arrastra o toca para seleccionar</p>
+                                    </div>
+                                </div>
+                                <button id="btn-upload-${taskId}" onclick="uploadTaskFiles('${taskId}')" class="w-full mt-3 bg-slate-200 text-slate-400 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-not-allowed" disabled>
+                                    <span>${isObserved ? 'Enviar Corrección' : 'Enviar Tarea'}</span>
+                                    <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                                </button>
+                                <div id="progress-bar-${taskId}" class="hidden w-full bg-slate-100 rounded-full h-2 mt-3 overflow-hidden">
+                                    <div id="progress-fill-${taskId}" class="bg-blue-600 h-full w-0 transition-all duration-300"></div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (status === 'ENTREGADO') {
+                         statusBadge = `<span class="bg-blue-100 text-blue-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Entregado</span>`;
+                         cardBorder = 'border-blue-200 bg-blue-50/20';
+                         const filesCount = submission.files ? submission.files.length : 1;
+                         actionArea = `<div class="mt-4 pt-4 border-t border-slate-100"><p class="text-sm text-slate-500 flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-blue-500"></i> Entrega realizada (${filesCount} foto/s)</p><div class="flex flex-wrap gap-2 mt-2">${(submission.files || [{url: submission.fileUrl}]).map((f, i) => `<a href="${f.url}" target="_blank" class="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold border border-blue-100 hover:bg-blue-100">Foto ${i+1}</a>`).join('')}</div></div>`;
+                    } else if (status === 'APROBADO') {
+                        statusBadge = `<span class="bg-emerald-100 text-emerald-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Aprobado</span>`;
+                        cardBorder = 'border-emerald-200 bg-emerald-50/20';
+                        actionArea = `<div class="mt-4 pt-4 border-t border-emerald-100"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold text-emerald-600 uppercase">Calificación</span><span class="text-lg font-bold text-emerald-700">${submission.grade || '20'}</span></div>${submission.feedback ? `<p class="text-sm text-slate-600 bg-white/50 p-3 rounded-lg border border-emerald-100 italic">"${submission.feedback}"</p>` : ''}<div class="flex flex-wrap gap-2 mt-2">${(submission.files || [{url: submission.fileUrl}]).map((f, i) => `<a href="${f.url}" target="_blank" class="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-1 rounded font-bold border border-emerald-100">Foto ${i+1}</a>`).join('')}</div></div>`;
+                    }
+                    const card = document.createElement('div');
+                    card.className = `bg-white p-6 rounded-2xl border ${cardBorder} shadow-sm transition-all`;
+                    card.innerHTML = `<div class="flex justify-between items-start mb-3"><div><h3 class="text-lg font-bold text-slate-800">${task.title}</h3><p class="text-xs text-slate-500 font-medium">Vence: ${task.date}</p></div>${statusBadge}</div>${actionArea}`;
+                    container.appendChild(card);
+                });
+            }
+            lucide.createIcons();
+        }
+
+        // ULTRA RÁPIDO: Limpieza de barra garantizada y subida por partes
         window.uploadTaskFiles = async function(taskId) {
             const files = window.selectedFiles[taskId];
             if (!files || files.length === 0) return;
@@ -168,138 +748,190 @@
             const progressBar = document.getElementById(`progress-bar-${taskId}`);
             const progressFill = document.getElementById(`progress-fill-${taskId}`);
 
+            // Reset UI
             btn.disabled = true;
-            btn.innerHTML = `Enviando...`;
+            btn.innerHTML = `<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-slate-400"></div> Enviando...`;
             progressBar.classList.remove('hidden');
+            progressFill.style.width = '10%';
             
-            // Usamos el código del alumno (NX-AIDU) para las rutas
-            const studentCode = window.currentUser.discountCode || `STU-${window.currentUser.id}`;
             const classId = window.currentUser.assignedClassId;
+            const studentId = window.currentUser.id;
             let uploadedFiles = [];
 
             try {
+                // Subimos de forma secuencial rápida para no saturar el canal de red del navegador
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
+                    
+                    // Compresión instantánea
+                    const compressedBlob = await compressImage(file);
+                    
                     const fileName = `hw_${Date.now()}_${i}.jpg`;
+                    const fileRef = storageRef(storage, `homework_uploads/${classId}/${taskId}/${studentId}/${fileName}`);
                     
-                    // 1. Ruta física en Storage
-                    const fileRef = storageRef(storage, `homework_uploads/${studentCode}/${taskId}/${fileName}`);
-                    
-                    // 2. Subida real
-                    const snapshot = await uploadBytes(fileRef, file);
-                    
-                    // 3. OBTENCIÓN AUTOMÁTICA DEL TOKEN (URL)
+                    // Subida directa
+                    const snapshot = await uploadBytes(fileRef, compressedBlob);
                     const url = await getDownloadURL(snapshot.ref);
                     
                     uploadedFiles.push({ url, name: file.name });
+                    
+                    // Actualización de barra
                     progressFill.style.width = `${((i + 1) / files.length) * 100}%`;
                 }
 
-                // 4. Guardado en Base de Datos
-                // IMPORTANTE: Guardamos 'fileUrl' para que tu página admin lo lea directamente
-                const submissionPath = `academy_v1/tasks/${classId}/${taskId}/submissions/${window.currentUser.id}`;
-                await update(ref(db, submissionPath), {
+                // Registro final en DB
+                const submissionRef = ref(db, `academy_v1/tasks/${classId}/${taskId}/submissions/${studentId}`);
+                await update(submissionRef, {
                     status: 'ENTREGADO',
                     files: uploadedFiles,
-                    fileUrl: uploadedFiles[0].url, // Link que abrirá el botón "Ver Imagen" del admin
                     timestamp: Date.now(),
                     studentName: window.currentUser.studentName
                 });
 
+                // Limpieza absoluta
                 delete window.selectedFiles[taskId];
-                alert("¡Tarea entregada con éxito!");
+                progressBar.classList.add('hidden');
+                progressFill.style.width = '0%';
+                
+                // Refresco visual
                 renderTasks();
 
             } catch (error) {
-                console.error("Error crítico:", error);
-                alert("Error de permisos. Verifica las reglas de Firebase.");
-                btn.disabled = false;
-                btn.innerHTML = `Reintentar`;
-            } finally {
+                console.error("Fallo crítico:", error);
+                // Forzamos el cierre de la barra en caso de error
                 progressBar.classList.add('hidden');
+                progressFill.style.width = '0%';
+                btn.disabled = false;
+                btn.innerHTML = `<span>Reintentar</span> <i data-lucide="upload-cloud" class="w-4 h-4"></i>`;
             }
         }
 
-        // Funciones auxiliares (Login, Secciones, Renderizado) se mantienen igual a tu lógica original
-        window.handleFileSelect = (e, taskId) => {
-            window.selectedFiles[taskId] = Array.from(e.target.files);
-            const btn = document.getElementById(`btn-upload-${taskId}`);
-            btn.disabled = false;
-            btn.classList.replace('bg-slate-200', 'bg-blue-600');
-            btn.classList.replace('text-slate-400', 'text-white');
-        };
+        // ---------------- RESTO DE FUNCIONALIDAD ----------------
+        window.toggleQR = (show) => {
+            const m = document.getElementById('qr-modal'), b = document.getElementById('qr-backdrop'), c = document.getElementById('qr-content');
+            if(show){ m.classList.remove('hidden'); setTimeout(() => { b.classList.remove('opacity-0'); c.classList.remove('opacity-0', 'scale-95', 'translate-y-4'); }, 20); }
+            else { b.classList.add('opacity-0'); c.classList.add('opacity-0', 'scale-95', 'translate-y-4'); setTimeout(() => m.classList.add('hidden'), 500); }
+        }
 
-        window.renderTasks = function() {
-            const container = document.getElementById('tasks-container');
-            const classId = window.currentUser.assignedClassId;
-            const tasks = window.systemData.tasks?.[classId] || {};
-            container.innerHTML = '';
-
-            Object.keys(tasks).forEach(taskId => {
-                const t = tasks[taskId];
-                const sub = t.submissions?.[window.currentUser.id];
-                const status = sub ? sub.status : 'PENDIENTE';
-
-                const card = document.createElement('div');
-                card.className = "bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-4";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-bold">${t.title}</h3>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-slate-100">${status}</span>
-                    </div>
-                    ${status === 'PENDIENTE' ? `
-                        <div class="mt-4">
-                            <input type="file" id="file-${taskId}" class="hidden" multiple onchange="handleFileSelect(event, '${taskId}')">
-                            <button onclick="document.getElementById('file-${taskId}').click()" class="w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50">Seleccionar Fotos</button>
-                            <div id="progress-bar-${taskId}" class="hidden w-full bg-slate-100 h-2 rounded-full mt-2 overflow-hidden">
-                                <div id="progress-fill-${taskId}" class="bg-blue-600 h-full w-0 transition-all"></div>
-                            </div>
-                            <button id="btn-upload-${taskId}" onclick="uploadTaskFiles('${taskId}')" class="w-full mt-3 bg-slate-200 text-slate-400 font-bold py-3 rounded-xl disabled" disabled>Enviar Tarea</button>
-                        </div>
-                    ` : `<p class="text-xs text-blue-600 font-bold mt-3">✓ Tarea enviada correctamente</p>`}
-                `;
-                container.appendChild(card);
-            });
-        };
-
-        window.handleLogin = (e) => {
-            e.preventDefault();
-            const code = document.getElementById('login-code').value.trim();
-            const pass = document.getElementById('login-pass').value.trim();
-            const student = window.systemData.students?.find(s => (s.discountCode || `STU-${s.id}`) === code && s.guardianDni === pass);
-            if (student) {
-                localStorage.setItem('nexus_student_session', student.id);
-                initDashboard(student);
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
+        window.renderCalendar = function() {
+            const daysContainer = document.getElementById('calendar-days');
+            if(!daysContainer) return;
+            daysContainer.innerHTML = '';
+            const startDayIndex = 3, totalDays = 31;
+            for(let i = 0; i < startDayIndex; i++) daysContainer.appendChild(document.createElement('div'));
+            for(let day = 1; day <= totalDays; day++) {
+                const dayEl = document.createElement('div');
+                dayEl.innerText = day;
+                dayEl.className = 'calendar-day';
+                if(window.currentUser) {
+                    const dateKey = `2026-01-${day < 10 ? '0'+day : day}`;
+                    let status = window.systemData.attendanceData?.[dateKey]?.[window.currentUser.id];
+                    if(!status) {
+                        const sched = (window.currentUser.schedule || "").toLowerCase();
+                        const currentWD = (startDayIndex + day - 1) % 7;
+                        const daysMap = ['lunes','martes','miércoles','jueves','viernes','sábado','domingo'];
+                        if(sched.includes(daysMap[currentWD])) dayEl.classList.add('status-pending', 'active-status');
+                    }
+                    if(status === 'A') dayEl.className = 'calendar-day status-present active-status';
+                    else if(status === 'T') dayEl.className = 'calendar-day status-late active-status';
+                    else if(status === 'F') dayEl.className = 'calendar-day status-absent active-status';
+                }
+                daysContainer.appendChild(dayEl);
             }
+        }
+
+        window.showSection = function(sectionId) {
+            ['section-home','section-payments','section-chat','section-tasks'].forEach(s => {
+                const sec = document.getElementById(s);
+                if(sec) sec.classList.add('hidden');
+            });
+            ['nav-home','nav-payments','nav-chat','nav-tasks'].forEach(n => {
+                const el = document.getElementById(n);
+                if(el) {
+                    el.classList.remove('active','bg-blue-50/80','text-blue-700');
+                    el.classList.add('text-slate-300');
+                }
+            });
+            const activeSec = document.getElementById(`section-${sectionId}`);
+            if(activeSec) {
+                activeSec.classList.remove('hidden');
+                if(sectionId === 'payments') activeSec.classList.add('flex');
+            }
+            const activeNav = document.getElementById(`nav-${sectionId}`);
+            if(activeNav) activeNav.classList.add('active','bg-white/10','text-white');
+            if(sectionId === 'chat') initGroupChat();
+            if(sectionId === 'tasks') renderTasks();
+            lucide.createIcons();
+        }
+
+        window.handleLogin = function(e) {
+            e.preventDefault();
+            const code = document.getElementById('login-code').value.trim(), pass = document.getElementById('login-pass').value.trim();
+            const student = window.systemData?.students?.find(s => (s.discountCode || `STU-${s.id}`).toUpperCase() === code.toUpperCase() && s.guardianDni === pass);
+            if (student) { localStorage.setItem('nexus_student_session', student.id); initDashboard(student); }
+            else document.getElementById('login-error').classList.remove('hidden');
         };
 
-        window.checkSession = () => {
+        document.getElementById('login-form').addEventListener('submit', window.handleLogin);
+
+        window.checkSession = function() {
             const sid = localStorage.getItem('nexus_student_session');
-            if (sid && window.systemData.students) {
+            if (sid && window.systemData?.students) {
                 const s = window.systemData.students.find(x => x.id == sid);
                 if (s) initDashboard(s);
             }
-        };
+        }
+
+        window.logout = () => { localStorage.removeItem('nexus_student_session'); location.reload(); }
 
         function initDashboard(student) {
             window.currentUser = student;
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
-            document.getElementById('welcome-name').innerText = student.studentName;
-            renderTasks();
+            document.getElementById('welcome-name').innerText = student.studentName.split(' ')[0];
+            document.getElementById('sidebar-name').innerText = student.studentName;
+            document.getElementById('sidebar-code').innerText = student.discountCode || `STU-${student.id}`;
+            document.getElementById('user-initials').innerText = student.studentName[0] + (student.studentLastName ? student.studentLastName[0] : '');
+            document.getElementById('dash-schedule').innerText = student.schedule || 'Por definir';
+            document.getElementById('dash-modality').innerText = student.modality || 'Presencial';
+            document.getElementById('dash-amount').innerText = Number(student.paymentAmount || 0).toFixed(2);
+            document.getElementById('dash-renewal-pay').innerText = student.renewalDate || '---';
+
+            const cls = window.systemData.classrooms?.find(c => c.id === student.assignedClassId);
+            const meetBtn = document.getElementById('btn-meet');
+            if (cls?.meetLink) {
+                meetBtn.href = cls.meetLink;
+                meetBtn.classList.remove('opacity-50','pointer-events-none','bg-slate-400');
+                document.getElementById('no-link-msg').classList.add('hidden');
+            } else {
+                meetBtn.classList.add('opacity-50','pointer-events-none','bg-slate-400');
+                document.getElementById('no-link-msg').classList.remove('hidden');
+            }
+            calculateAttendance(student.id);
+            renderCalendar();
+            lucide.createIcons();
         }
 
-        window.showSection = (id) => {
-            document.getElementById('section-home').classList.add('hidden');
-            document.getElementById('section-tasks').classList.add('hidden');
-            document.getElementById(`section-${id}`).classList.remove('hidden');
-        };
+        function calculateAttendance(sid) {
+            let p=0, t=0, f=0;
+            if(window.systemData.attendanceData) {
+                Object.values(window.systemData.attendanceData).forEach(d => {
+                    if(d[sid]==='A') p++; else if(d[sid]==='T') t++; else if(d[sid]==='F') f++;
+                });
+            }
+            document.getElementById('stat-present').innerText = p;
+            document.getElementById('stat-late').innerText = t;
+            document.getElementById('stat-absent').innerText = f;
+            const perc = (p+t+f) > 0 ? Math.round((p/(p+t+f))*100) : 0;
+            const percEl = document.getElementById('stat-present-percent');
+            if(percEl) percEl.innerText = `${perc}%`;
+            setTimeout(() => {
+                const ring = document.getElementById('ring-present');
+                if(ring) ring.setAttribute('stroke-dasharray', `${perc}, 100`);
+            }, 500);
+        }
 
-        window.logout = () => { localStorage.removeItem('nexus_student_session'); location.reload(); };
-        document.getElementById('login-form').addEventListener('submit', window.handleLogin);
-        lucide.createIcons();
+        window.onload = () => lucide.createIcons();
     </script>
 </body>
 </html>
