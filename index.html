@@ -472,7 +472,7 @@
             }
         });
 
-        // ---------------- HELPER: ULTRA FAST IMAGE COMPRESSION ----------------
+        // ---------------- HELPER: ULTRA FAST IMAGE COMPRESSION (OPTIMIZADO) ----------------
         async function compressImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -484,7 +484,9 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const max_size = 800; // Limite más estricto para subida instantánea
+                        
+                        // CAMBIO: Aumentado de 800 a 1600 para mejor calidad
+                        const max_size = 1600; 
                         
                         if (width > height) {
                             if (width > max_size) {
@@ -507,7 +509,7 @@
                             resolve(blob);
                             // Liberar memoria
                             img.src = "";
-                        }, 'image/jpeg', 0.4); // Calidad 0.4: Máxima velocidad y legibilidad perfecta
+                        }, 'image/jpeg', 0.8); // CAMBIO: Calidad subida de 0.4 a 0.8 (mucho más nítido)
                     };
                 };
             });
@@ -690,8 +692,6 @@
                     const status = submission ? submission.status : 'PENDIENTE';
                     let statusBadge = '', actionArea = '', cardBorder = 'border-slate-200';
                    
-                    // --- CORRECCIÓN: Buscamos el texto con varios nombres posibles ---
-                    // Esto revisa si se guardó como descripción, instrucción o nota.
                     const textContent = task.description || task.instruction || task.instructions || task.nota || task.details || "";
 
                     const descriptionHtml = textContent 
@@ -700,7 +700,6 @@
                              ${textContent}
                            </div>` 
                         : '';
-                    // -----------------------------------------------------------------
 
                     if (status === 'PENDIENTE' || status === 'OBSERVADO') {
                         const isObserved = status === 'OBSERVADO';
@@ -744,7 +743,6 @@
                     const card = document.createElement('div');
                     card.className = `bg-white p-6 rounded-2xl border ${cardBorder} shadow-sm transition-all`;
                     
-                    // --- Aquí se inyecta la descripción y el área de acción ---
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-3">
                             <div>
