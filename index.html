@@ -459,18 +459,35 @@
         const db = getDatabase(app);
         const storage = getStorage(app);
 
-        window.systemData = null;
+window.systemData = null;
         window.currentUser = null;
-        window.selectedFiles = {}; // Store array of files per taskId
+        window.appLoaded = false; // <--- USAREMOS ESTE NOMBRE ÚNICO
+        window.selectedFiles = {};
 
         const dbRef = ref(db, 'academy_v1');
-        onValue(dbRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                window.systemData = data;
-                checkSession(); 
+onValue(dbRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        window.systemData = data;
+
+        // CASO A: Apenas entramos a la página (Carga inicial)
+        if (!window.appLoaded) {
+            window.checkSession();
+        } 
+        // CASO B: Ya estamos adentro (Actualizaciones en vivo)
+        else {
+            // Solo revisamos si te acaban de inhabilitar mientras usabas la app
+            const sid = localStorage.getItem('nexus_student_session');
+            const s = data.students.find(u => u.id === sid);
+            
+            if (s && s.active === false) {
+                alert("Tu cuenta ha sido desactivada.");
+                localStorage.removeItem('nexus_student_session');
+                location.reload();
             }
-        });
+        }
+    }
+});
 
         // ---------------- HELPER: ULTRA FAST IMAGE COMPRESSION (OPTIMIZADO) ----------------
         async function compressImage(file) {
@@ -887,27 +904,66 @@
             lucide.createIcons();
         }
 
-        window.handleLogin = function(e) {
-            e.preventDefault();
-            const code = document.getElementById('login-code').value.trim(), pass = document.getElementById('login-pass').value.trim();
-            const student = window.systemData?.students?.find(s => (s.discountCode || `STU-${s.id}`).toUpperCase() === code.toUpperCase() && s.guardianDni === pass);
-            if (student) { localStorage.setItem('nexus_student_session', student.id); initDashboard(student); }
-            else document.getElementById('login-error').classList.remove('hidden');
-        };
+window.handleLogin = function(e) {
+    e.preventDefault();
+    const code = document.getElementById('login-code').value.trim(), 
+          pass = document.getElementById('login-pass').value.trim();
+    
+    const student = window.systemData?.students?.find(s => 
+        (s.discountCode || `STU-${s.id}`).toUpperCase() === code.toUpperCase() && 
+        s.guardianDni === pass
+    );
 
-        document.getElementById('login-form').addEventListener('submit', window.handleLogin);
-
-        window.checkSession = function() {
-            const sid = localStorage.getItem('nexus_student_session');
-            if (sid && window.systemData?.students) {
-                const s = window.systemData.students.find(x => x.id == sid);
-                if (s) initDashboard(s);
-            }
+    if (student) {
+        if (student.active === false) {
+            alert("⚠️ Tu cuenta se encuentra inhabilitada.");
+            return;
         }
+        localStorage.setItem('nexus_student_session', student.id); 
+        
+        window.appLoaded = true; // <--- AQUÍ ESTABA EL ERROR (Corregido)
+        
+        initDashboard(student); 
+    } else {
+        document.getElementById('login-error').classList.remove('hidden');
+    }
+};
 
-        window.logout = () => { localStorage.removeItem('nexus_student_session'); location.reload(); }
+// Variable de seguridad (Pon esto justo antes de checkSession)
+window.appLoaded = false; 
+
+window.checkSession = function() {
+    // Si la app ya cargó, DETENTE.
+    if (window.appLoaded) return;
+
+    const sid = localStorage.getItem('nexus_student_session');
+    
+    if (!sid) return; 
+
+    if (window.systemData?.students) {
+        const s = window.systemData.students.find(x => x.id == sid);
+        
+        if (s) {
+            if (s.active === false) {
+                localStorage.removeItem('nexus_student_session');
+                location.reload(); 
+                return;
+            }
+
+            window.appLoaded = true; // <--- Corregido
+            initDashboard(s);
+        }
+    }
+}
+        // --- AQUÍ VA EL LOGOUT CORREGIDO ---
+        window.logout = () => { 
+    localStorage.removeItem('nexus_student_session'); 
+    window.appLoaded = false; // <--- Corregido
+    location.reload(); 
+}
 
         function initDashboard(student) {
+            // ... resto de tu código de inicialización ...
             window.currentUser = student;
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
@@ -967,7 +1023,15 @@
             }, 500);
         }
 
-        window.onload = () => lucide.createIcons();
+window.onload = () => lucide.createIcons();
+
+        // --- LO QUE VAS A PEGAR ---
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', window.handleLogin);
+        }
+        // --------------------------
+
     </script>
 </body>
 </html>
