@@ -288,11 +288,16 @@
                         <div class="space-y-8">
                             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                                 <div class="flex items-center justify-between mb-4">
-                                    <h3 class="font-bold text-slate-800 text-sm tracking-wide uppercase">ENERO 2026</h3>
-                                    <div class="bg-slate-100 p-2 rounded-full">
-                                        <i data-lucide="calendar" class="w-4 h-4 text-slate-500"></i>
-                                    </div>
-                                </div>
+    <h3 id="calendar-month-year" class="font-bold text-slate-800 text-sm tracking-wide uppercase">CARGANDO...</h3>
+    <div class="flex gap-2">
+        <button onclick="changeMonth(-1)" class="bg-slate-100 p-2 rounded-full hover:bg-slate-200 transition-colors">
+            <i data-lucide="chevron-left" class="w-5 h-5 text-slate-500"></i>
+        </button>
+        <button onclick="changeMonth(1)" class="bg-slate-100 p-2 rounded-full hover:bg-slate-200 transition-colors">
+            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-500"></i>
+        </button>
+    </div>
+</div>
                                 <div class="calendar-grid mb-2">
                                     <div class="calendar-head">L</div>
                                     <div class="calendar-head">M</div>
@@ -853,25 +858,61 @@ onValue(dbRef, (snapshot) => {
             else { b.classList.add('opacity-0'); c.classList.add('opacity-0', 'scale-95', 'translate-y-4'); setTimeout(() => m.classList.add('hidden'), 500); }
         }
 
+        // Variable global para rastrear el mes que estamos viendo
+        window.currentCalendarDate = new Date(); // Inicia en la fecha actual (ej. Marzo 2026)
+
+        // Función para cambiar el mes al hacer clic en las flechas
+        window.changeMonth = function(offset) {
+            window.currentCalendarDate.setMonth(window.currentCalendarDate.getMonth() + offset);
+            window.renderCalendar();
+            lucide.createIcons(); // Recargamos los iconos por si acaso
+        }
+
         window.renderCalendar = function() {
             const daysContainer = document.getElementById('calendar-days');
-            if(!daysContainer) return;
+            const monthYearLabel = document.getElementById('calendar-month-year');
+            if(!daysContainer || !monthYearLabel) return;
+            
             daysContainer.innerHTML = '';
-            const startDayIndex = 3, totalDays = 31;
-            for(let i = 0; i < startDayIndex; i++) daysContainer.appendChild(document.createElement('div'));
+            
+            const year = window.currentCalendarDate.getFullYear();
+            const month = window.currentCalendarDate.getMonth();
+            
+            // Nombres de meses para el título
+            const monthNames = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+            monthYearLabel.innerText = `${monthNames[month]} ${year}`;
+
+            // Calcular días totales del mes actual y el día de la semana en que inicia
+            let firstDay = new Date(year, month, 1).getDay();
+            // Ajustar para que Lunes sea 0 y Domingo sea 6 (getDay() devuelve 0 para Domingo)
+            const startDayIndex = firstDay === 0 ? 6 : firstDay - 1; 
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            // Rellenar espacios vacíos antes del primer día
+            for(let i = 0; i < startDayIndex; i++) {
+                daysContainer.appendChild(document.createElement('div'));
+            }
+            
             for(let day = 1; day <= totalDays; day++) {
                 const dayEl = document.createElement('div');
                 dayEl.innerText = day;
                 dayEl.className = 'calendar-day';
+                
                 if(window.currentUser) {
-                    const dateKey = `2026-01-${day < 10 ? '0'+day : day}`;
+                    // Formatear fecha para buscar en Firebase (YYYY-MM-DD)
+                    const monthStr = (month + 1).toString().padStart(2, '0');
+                    const dayStr = day.toString().padStart(2, '0');
+                    const dateKey = `${year}-${monthStr}-${dayStr}`;
+                    
                     let status = window.systemData.attendanceData?.[dateKey]?.[window.currentUser.id];
+                    
                     if(!status) {
                         const sched = (window.currentUser.schedule || "").toLowerCase();
                         const currentWD = (startDayIndex + day - 1) % 7;
                         const daysMap = ['lunes','martes','miércoles','jueves','viernes','sábado','domingo'];
                         if(sched.includes(daysMap[currentWD])) dayEl.classList.add('status-pending', 'active-status');
                     }
+                    
                     if(status === 'A') dayEl.className = 'calendar-day status-present active-status';
                     else if(status === 'T') dayEl.className = 'calendar-day status-late active-status';
                     else if(status === 'F') dayEl.className = 'calendar-day status-absent active-status';
@@ -879,7 +920,6 @@ onValue(dbRef, (snapshot) => {
                 daysContainer.appendChild(dayEl);
             }
         }
-
         window.showSection = function(sectionId) {
             ['section-home','section-payments','section-chat','section-tasks'].forEach(s => {
                 const sec = document.getElementById(s);
