@@ -162,8 +162,11 @@
                 <a href="https://drive.google.com/drive/folders/1NQU77izbooxSF1Cp-0EqwbjGrcD6mHvR?usp=sharing" target="_blank" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
                     <i data-lucide="book-open" class="w-5 h-5"></i> Material de Estudio
                 </a>
-                <button onclick="showSection('tasks'); toggleMobileMenu(false)" id="nav-tasks" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+               <button onclick="showSection('tasks'); toggleMobileMenu(false)" id="nav-tasks" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
                     <i data-lucide="clipboard-list" class="w-5 h-5"></i> Tareas
+                </button>
+                <button onclick="showSection('terms'); toggleMobileMenu(false)" id="nav-terms" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i data-lucide="file-text" class="w-5 h-5"></i> Términos y Condiciones
                 </button>
             </div>
 
@@ -416,11 +419,95 @@
                         </div>
                     </div>
                     <div id="tasks-container" class="space-y-4"></div>
-                    <div id="tasks-empty" class="hidden flex flex-col items-center justify-center py-12 text-slate-400">
+                   <div id="tasks-empty" class="hidden flex flex-col items-center justify-center py-12 text-slate-400">
                         <i data-lucide="clipboard-check" class="w-16 h-16 mb-4 opacity-30"></i>
                         <p class="font-medium">¡Estás al día! No hay tareas pendientes.</p>
                     </div>
                 </div>
+
+                <div id="section-terms" class="hidden max-w-5xl mx-auto fade-in space-y-6">
+                    <div class="bg-white rounded-2xl p-8 border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800 font-oswald">Términos y Condiciones</h2>
+                            <p class="text-slate-500 text-sm">Políticas, normativas y acuerdos de la academia</p>
+                        </div>
+                        <div class="w-12 h-12 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm text-slate-600 text-sm leading-relaxed space-y-4">
+                        
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <button onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.chevron').classList.toggle('-rotate-180')" class="w-full flex items-center justify-between p-5 bg-slate-50 hover:bg-slate-100 transition-colors text-left group">
+                                <h3 class="text-lg font-bold text-slate-800">1. Política de Pagos y Descuentos</h3>
+                                <i data-lucide="chevron-down" class="chevron w-5 h-5 text-slate-400 transition-transform duration-300 -rotate-180"></i>
+                            </button>
+                            <div class="p-6 bg-white border-t border-slate-100">
+                                <h4 class="font-bold text-slate-700 mb-2">Modalidades y Tarifas Regulares</h4>
+                                <p class="mb-2">Las tarifas regulares (sin descuentos) se establecen de la siguiente manera, en base a un mes estándar de 8 clases:</p>
+                                <ul class="list-disc pl-5 mb-4 space-y-1">
+                                    <li><strong>Clases Individuales:</strong> Paquete mensual regular (8 clases) a S/ 200.00. Costo regular por clase individual: S/ 25.00.</li>
+                                    <li><strong>Clases Grupales:</strong> Paquete mensual regular (8 clases) a S/ 100.00. Costo regular por clase grupal: S/ 12.50.</li>
+                                </ul>
+
+                                <h4 class="font-bold text-slate-700 mt-4 mb-2">Condiciones de Pago y Vigencia</h4>
+                                <ul class="list-disc pl-5 mb-4 space-y-1">
+                                    <li><strong>Pagos:</strong> El abono de los paquetes mensuales o promocionales debe realizarse obligatoriamente por adelantado, antes del inicio de la primera sesión programada.</li>
+                                    <li><strong>Vigencia:</strong> Los paquetes mensuales de 8 clases tienen una vigencia máxima de 30 días calendario (o un máximo de 5 semanas para cubrir imprevistos) desde su adquisición. Las clases no consumidas dentro de este lapso no son acumulables.</li>
+                                </ul>
+
+                                <h4 class="font-bold text-slate-700 mt-4 mb-2">Promociones de Temporada: Inicio del Año Escolar</h4>
+                                <ul class="list-disc pl-5 mb-4 space-y-1">
+                                    <li><strong>Descuento por Retorno a Clases:</strong> Nexus Chess ofrece ocasionalmente tarifas reducidas para apoyar a las familias durante la temporada de inicio de clases escolares del alumno.</li>
+                                    <li><strong>Temporalidad de la Promoción:</strong> Este descuento es de carácter estrictamente temporal y aplica únicamente para el primer periodo promocional contratado bajo esta campaña.</li>
+                                    <li><strong>Pase a Tarifa Regular:</strong> Al finalizar el mes o paquete adquirido bajo el descuento de "Inicio de Clases Escolares", la promoción caduca automáticamente. La renovación para el siguiente ciclo se realizará al cobro de la tarifa regular total correspondiente a la frecuencia de clases del alumno (ej. tarifa regular completa de S/ 560.00 por el paquete extendido), sin excepciones.</li>
+                                </ul>
+
+                                <h4 class="font-bold text-slate-700 mt-4 mb-2">Política de Retiro y Reembolso Anticipado</h4>
+                                <ul class="list-disc pl-5 mb-4 space-y-1">
+                                    <li><strong>Pérdida de beneficios:</strong> Si un alumno adquiere un paquete promocional y decide retirarse antes de finalizar la totalidad de las clases estipuladas, pierde el beneficio del costo reducido.</li>
+                                    <li><strong>Recálculo de clases consumidas:</strong> Todas las clases que el alumno haya tomado hasta el momento de su retiro serán recalculadas a su tarifa regular (S/ 25.00 por clase individual o S/ 12.50 por clase grupal).</li>
+                                    <li><strong>Fórmula y límite de reembolso:</strong> El monto a devolver se calculará restando el costo de las clases tomadas (a precio regular) del monto total pagado inicialmente por la promoción. Si el costo de las clases consumidas a tarifa regular es igual o mayor al monto pagado, no procederá ningún reembolso.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <button onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.chevron').classList.toggle('-rotate-180')" class="w-full flex items-center justify-between p-5 bg-slate-50 hover:bg-slate-100 transition-colors text-left group">
+                                <h3 class="text-lg font-bold text-slate-800">2. Asistencia, Tardanzas y Reprogramaciones</h3>
+                                <i data-lucide="chevron-down" class="chevron w-5 h-5 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="p-6 bg-white border-t border-slate-100 hidden">
+                                <ul class="list-disc pl-5 space-y-3">
+                                    <li><strong>Clases Grupales:</strong> Dado que el avance del temario y el horario dependen del grupo completo, las inasistencias a las clases grupales no son recuperables ni reembolsables bajo ninguna circunstancia.</li>
+                                    <li><strong>Clases Individuales:</strong> Para reprogramar una clase individual sin perderla, el alumno o su apoderado debe dar aviso a la administración con un mínimo de 24 horas de anticipación. Si el aviso se realiza con menor tiempo o el alumno no se presenta a la sesión, la clase se considerará como "tomada" y se descontará de su paquete mensual.</li>
+                                    <li><strong>Aviso de Retiro Definitivo:</strong> Toda solicitud de retiro definitivo debe comunicarse con al menos 24 horas de anticipación a la siguiente clase programada. De lo contrario, dicha clase se considerará como "tomada" para efectos del cálculo de cualquier posible reembolso.</li>
+                                    <li><strong>Tardanzas:</strong> El tiempo de tardanza del alumno (tanto en la modalidad grupal como individual) no será compensado al final de la sesión. La clase terminará exactamente en el horario originalmente establecido, por respeto al tiempo del profesor y de los estudiantes del siguiente turno.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <button onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.chevron').classList.toggle('-rotate-180')" class="w-full flex items-center justify-between p-5 bg-slate-50 hover:bg-slate-100 transition-colors text-left group">
+                                <h3 class="text-lg font-bold text-slate-800">3. Normas de Convivencia</h3>
+                                <i data-lucide="chevron-down" class="chevron w-5 h-5 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="p-6 bg-white border-t border-slate-100 hidden">
+                                <ul class="list-disc pl-5 space-y-3">
+                                    <li>Se espera que todos los alumnos mantengan un comportamiento de respeto, orden y deportividad en todo momento, tanto con el profesor como con sus compañeros de academia.</li>
+                                    <li>Nexus Chess se reserva el derecho de separar a un alumno de una clase grupal o individual si su conducta interrumpe sistemáticamente el desarrollo óptimo de la sesión. En estos casos, se aplicarán las mismas políticas de retiro para el cálculo de cualquier saldo restante a su favor.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 mt-6">
+                            <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                                <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500"></i> Aceptación del Reglamento
+                            </h3>
+                            <p class="text-slate-700">La realización del pago de cualquier paquete, mensualidad o promoción confirma la lectura, comprensión y aceptación total de las normativas estipuladas en estos Términos y Condiciones por parte del alumno y/o su apoderado legal.</p>
+                        </div>
+                    </div>
             </div>
         </main>
     </div>
@@ -921,12 +1008,11 @@ onValue(dbRef, (snapshot) => {
             }
         }
         window.showSection = function(sectionId) {
-            ['section-home','section-payments','section-chat','section-tasks'].forEach(s => {
+            ['section-home','section-payments','section-chat','section-tasks','section-terms'].forEach(s => {
                 const sec = document.getElementById(s);
                 if(sec) sec.classList.add('hidden');
             });
-            ['nav-home','nav-payments','nav-chat','nav-tasks'].forEach(n => {
-                const el = document.getElementById(n);
+            ['nav-home','nav-payments','nav-chat','nav-tasks','nav-terms'].forEach(n => {                const el = document.getElementById(n);
                 if(el) {
                     el.classList.remove('active','bg-blue-50/80','text-blue-700');
                     el.classList.add('text-slate-300');
